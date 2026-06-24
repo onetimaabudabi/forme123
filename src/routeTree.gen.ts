@@ -13,6 +13,7 @@ import { Route as TabsRouteImport } from './routes/_tabs'
 import { Route as TabsIndexRouteImport } from './routes/_tabs.index'
 import { Route as TabsWorkoutRouteImport } from './routes/_tabs.workout'
 import { Route as TabsProgressRouteImport } from './routes/_tabs.progress'
+import { Route as TabsProfileRouteImport } from './routes/_tabs.profile'
 import { Route as TabsCoachRouteImport } from './routes/_tabs.coach'
 
 const TabsRoute = TabsRouteImport.update({
@@ -34,6 +35,11 @@ const TabsProgressRoute = TabsProgressRouteImport.update({
   path: '/progress',
   getParentRoute: () => TabsRoute,
 } as any)
+const TabsProfileRoute = TabsProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => TabsRoute,
+} as any)
 const TabsCoachRoute = TabsCoachRouteImport.update({
   id: '/coach',
   path: '/coach',
@@ -43,11 +49,13 @@ const TabsCoachRoute = TabsCoachRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof TabsIndexRoute
   '/coach': typeof TabsCoachRoute
+  '/profile': typeof TabsProfileRoute
   '/progress': typeof TabsProgressRoute
   '/workout': typeof TabsWorkoutRoute
 }
 export interface FileRoutesByTo {
   '/coach': typeof TabsCoachRoute
+  '/profile': typeof TabsProfileRoute
   '/progress': typeof TabsProgressRoute
   '/workout': typeof TabsWorkoutRoute
   '/': typeof TabsIndexRoute
@@ -56,19 +64,21 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_tabs': typeof TabsRouteWithChildren
   '/_tabs/coach': typeof TabsCoachRoute
+  '/_tabs/profile': typeof TabsProfileRoute
   '/_tabs/progress': typeof TabsProgressRoute
   '/_tabs/workout': typeof TabsWorkoutRoute
   '/_tabs/': typeof TabsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/coach' | '/progress' | '/workout'
+  fullPaths: '/' | '/coach' | '/profile' | '/progress' | '/workout'
   fileRoutesByTo: FileRoutesByTo
-  to: '/coach' | '/progress' | '/workout' | '/'
+  to: '/coach' | '/profile' | '/progress' | '/workout' | '/'
   id:
     | '__root__'
     | '/_tabs'
     | '/_tabs/coach'
+    | '/_tabs/profile'
     | '/_tabs/progress'
     | '/_tabs/workout'
     | '/_tabs/'
@@ -108,6 +118,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TabsProgressRouteImport
       parentRoute: typeof TabsRoute
     }
+    '/_tabs/profile': {
+      id: '/_tabs/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof TabsProfileRouteImport
+      parentRoute: typeof TabsRoute
+    }
     '/_tabs/coach': {
       id: '/_tabs/coach'
       path: '/coach'
@@ -120,6 +137,7 @@ declare module '@tanstack/react-router' {
 
 interface TabsRouteChildren {
   TabsCoachRoute: typeof TabsCoachRoute
+  TabsProfileRoute: typeof TabsProfileRoute
   TabsProgressRoute: typeof TabsProgressRoute
   TabsWorkoutRoute: typeof TabsWorkoutRoute
   TabsIndexRoute: typeof TabsIndexRoute
@@ -127,6 +145,7 @@ interface TabsRouteChildren {
 
 const TabsRouteChildren: TabsRouteChildren = {
   TabsCoachRoute: TabsCoachRoute,
+  TabsProfileRoute: TabsProfileRoute,
   TabsProgressRoute: TabsProgressRoute,
   TabsWorkoutRoute: TabsWorkoutRoute,
   TabsIndexRoute: TabsIndexRoute,
