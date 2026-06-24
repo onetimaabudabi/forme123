@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as NutritionRouteImport } from './routes/nutrition'
 import { Route as TabsRouteImport } from './routes/_tabs'
 import { Route as TabsIndexRouteImport } from './routes/_tabs.index'
 import { Route as TabsWorkoutRouteImport } from './routes/_tabs.workout'
@@ -26,6 +27,11 @@ const SigninRoute = SigninRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NutritionRoute = NutritionRouteImport.update({
+  id: '/nutrition',
+  path: '/nutrition',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TabsRoute = TabsRouteImport.update({
@@ -60,6 +66,7 @@ const TabsCoachRoute = TabsCoachRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof TabsIndexRoute
+  '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
   '/signin': typeof SigninRoute
   '/coach': typeof TabsCoachRoute
@@ -68,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/workout': typeof TabsWorkoutRoute
 }
 export interface FileRoutesByTo {
+  '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
   '/signin': typeof SigninRoute
   '/coach': typeof TabsCoachRoute
@@ -79,6 +87,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_tabs': typeof TabsRouteWithChildren
+  '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
   '/signin': typeof SigninRoute
   '/_tabs/coach': typeof TabsCoachRoute
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/nutrition'
     | '/onboarding'
     | '/signin'
     | '/coach'
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/workout'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/nutrition'
     | '/onboarding'
     | '/signin'
     | '/coach'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_tabs'
+    | '/nutrition'
     | '/onboarding'
     | '/signin'
     | '/_tabs/coach'
@@ -120,6 +132,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   TabsRoute: typeof TabsRouteWithChildren
+  NutritionRoute: typeof NutritionRoute
   OnboardingRoute: typeof OnboardingRoute
   SigninRoute: typeof SigninRoute
 }
@@ -138,6 +151,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nutrition': {
+      id: '/nutrition'
+      path: '/nutrition'
+      fullPath: '/nutrition'
+      preLoaderRoute: typeof NutritionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_tabs': {
@@ -205,6 +225,7 @@ const TabsRouteWithChildren = TabsRoute._addFileChildren(TabsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   TabsRoute: TabsRouteWithChildren,
+  NutritionRoute: NutritionRoute,
   OnboardingRoute: OnboardingRoute,
   SigninRoute: SigninRoute,
 }
