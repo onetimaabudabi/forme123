@@ -32,12 +32,12 @@ function Settings() {
         <h2 className="mt-6 text-xs uppercase tracking-wider font-semibold text-foreground/40 px-1">Preferences</h2>
         <div className="mt-2 surface divide-y divide-black/5">
           <div className="flex items-center gap-3 px-4 py-3.5">
-            <div className="size-9 rounded-xl bg-secondary flex items-center justify-center"><Bell className="size-4.5" /></div>
+            <div className="size-9 rounded-xl bg-secondary flex items-center justify-center"><Bell className="size-[18px]" /></div>
             <span className="flex-1 text-[15px] font-medium">Notifications</span>
             <Toggle on={notif} onChange={setNotif} />
           </div>
           <div className="flex items-center gap-3 px-4 py-3.5">
-            <div className="size-9 rounded-xl bg-secondary flex items-center justify-center"><Moon className="size-4.5" /></div>
+            <div className="size-9 rounded-xl bg-secondary flex items-center justify-center"><Moon className="size-[18px]" /></div>
             <span className="flex-1 text-[15px] font-medium">Dark mode</span>
             <Toggle on={dark} onChange={setDark} />
           </div>
@@ -65,7 +65,7 @@ function Settings() {
 function Row({ icon: Icon, label, hint }: { icon: typeof Bell; label: string; hint?: string }) {
   return (
     <div className="flex items-center gap-3 px-4 py-3.5">
-      <div className="size-9 rounded-xl bg-secondary flex items-center justify-center"><Icon className="size-4.5" /></div>
+      <div className="size-9 rounded-xl bg-secondary flex items-center justify-center"><Icon className="size-[18px]" /></div>
       <span className="flex-1 text-[15px] font-medium">{label}</span>
       {hint && <span className="text-xs text-foreground/40">{hint}</span>}
       <ChevronRight className="size-4 text-foreground/30" />

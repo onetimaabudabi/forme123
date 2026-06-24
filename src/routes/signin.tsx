@@ -38,10 +38,10 @@ function SignIn() {
         </div>
 
         <div className="space-y-2.5">
-          <button className="w-full h-13 py-3.5 rounded-full bg-secondary flex items-center justify-center gap-2 font-semibold text-sm">
+          <button className="w-full py-3.5 rounded-full bg-secondary flex items-center justify-center gap-2 font-semibold text-sm">
             <Apple className="size-4" fill="currentColor" /> Continue with Apple
           </button>
-          <button className="w-full h-13 py-3.5 rounded-full bg-secondary flex items-center justify-center gap-2 font-semibold text-sm">
+          <button className="w-full py-3.5 rounded-full bg-secondary flex items-center justify-center gap-2 font-semibold text-sm">
             <Mail className="size-4" /> Continue with email
           </button>
         </div>

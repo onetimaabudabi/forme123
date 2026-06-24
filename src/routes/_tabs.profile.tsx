@@ -10,7 +10,7 @@ function Row({ to, icon: Icon, label, hint }: { to: string; icon: typeof Trophy;
   return (
     <Link to={to as "/"} className="flex items-center gap-3 px-4 py-3.5 hover:bg-foreground/[0.02] transition">
       <div className="size-9 rounded-xl bg-secondary flex items-center justify-center">
-        <Icon className="size-4.5" />
+        <Icon className="size-[18px]" />
       </div>
       <span className="flex-1 text-[15px] font-medium">{label}</span>
       {hint && <span className="text-xs text-foreground/40">{hint}</span>}
