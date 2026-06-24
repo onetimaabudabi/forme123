@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TabsRouteImport } from './routes/_tabs'
 import { Route as TabsIndexRouteImport } from './routes/_tabs.index'
+import { Route as TabsWorkoutRouteImport } from './routes/_tabs.workout'
 
 const TabsRoute = TabsRouteImport.update({
   id: '/_tabs',
@@ -21,24 +22,32 @@ const TabsIndexRoute = TabsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => TabsRoute,
 } as any)
+const TabsWorkoutRoute = TabsWorkoutRouteImport.update({
+  id: '/workout',
+  path: '/workout',
+  getParentRoute: () => TabsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof TabsIndexRoute
+  '/workout': typeof TabsWorkoutRoute
 }
 export interface FileRoutesByTo {
+  '/workout': typeof TabsWorkoutRoute
   '/': typeof TabsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_tabs': typeof TabsRouteWithChildren
+  '/_tabs/workout': typeof TabsWorkoutRoute
   '/_tabs/': typeof TabsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/workout'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/_tabs' | '/_tabs/'
+  to: '/workout' | '/'
+  id: '__root__' | '/_tabs' | '/_tabs/workout' | '/_tabs/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -61,14 +70,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TabsIndexRouteImport
       parentRoute: typeof TabsRoute
     }
+    '/_tabs/workout': {
+      id: '/_tabs/workout'
+      path: '/workout'
+      fullPath: '/workout'
+      preLoaderRoute: typeof TabsWorkoutRouteImport
+      parentRoute: typeof TabsRoute
+    }
   }
 }
 
 interface TabsRouteChildren {
+  TabsWorkoutRoute: typeof TabsWorkoutRoute
   TabsIndexRoute: typeof TabsIndexRoute
 }
 
 const TabsRouteChildren: TabsRouteChildren = {
+  TabsWorkoutRoute: TabsWorkoutRoute,
   TabsIndexRoute: TabsIndexRoute,
 }
 
