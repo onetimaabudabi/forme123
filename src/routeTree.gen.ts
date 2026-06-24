@@ -9,61 +9,268 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as SigninRouteImport } from './routes/signin'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as NutritionRouteImport } from './routes/nutrition'
+import { Route as AchievementsRouteImport } from './routes/achievements'
+import { Route as TabsRouteImport } from './routes/_tabs'
+import { Route as TabsIndexRouteImport } from './routes/_tabs.index'
+import { Route as TabsWorkoutRouteImport } from './routes/_tabs.workout'
+import { Route as TabsProgressRouteImport } from './routes/_tabs.progress'
+import { Route as TabsProfileRouteImport } from './routes/_tabs.profile'
+import { Route as TabsCoachRouteImport } from './routes/_tabs.coach'
 
-const IndexRoute = IndexRouteImport.update({
+const SigninRoute = SigninRouteImport.update({
+  id: '/signin',
+  path: '/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NutritionRoute = NutritionRouteImport.update({
+  id: '/nutrition',
+  path: '/nutrition',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AchievementsRoute = AchievementsRouteImport.update({
+  id: '/achievements',
+  path: '/achievements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TabsRoute = TabsRouteImport.update({
+  id: '/_tabs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TabsIndexRoute = TabsIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => TabsRoute,
+} as any)
+const TabsWorkoutRoute = TabsWorkoutRouteImport.update({
+  id: '/workout',
+  path: '/workout',
+  getParentRoute: () => TabsRoute,
+} as any)
+const TabsProgressRoute = TabsProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
+  getParentRoute: () => TabsRoute,
+} as any)
+const TabsProfileRoute = TabsProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => TabsRoute,
+} as any)
+const TabsCoachRoute = TabsCoachRouteImport.update({
+  id: '/coach',
+  path: '/coach',
+  getParentRoute: () => TabsRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof TabsIndexRoute
+  '/achievements': typeof AchievementsRoute
+  '/nutrition': typeof NutritionRoute
+  '/onboarding': typeof OnboardingRoute
+  '/settings': typeof SettingsRoute
+  '/signin': typeof SigninRoute
+  '/coach': typeof TabsCoachRoute
+  '/profile': typeof TabsProfileRoute
+  '/progress': typeof TabsProgressRoute
+  '/workout': typeof TabsWorkoutRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/achievements': typeof AchievementsRoute
+  '/nutrition': typeof NutritionRoute
+  '/onboarding': typeof OnboardingRoute
+  '/settings': typeof SettingsRoute
+  '/signin': typeof SigninRoute
+  '/coach': typeof TabsCoachRoute
+  '/profile': typeof TabsProfileRoute
+  '/progress': typeof TabsProgressRoute
+  '/workout': typeof TabsWorkoutRoute
+  '/': typeof TabsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_tabs': typeof TabsRouteWithChildren
+  '/achievements': typeof AchievementsRoute
+  '/nutrition': typeof NutritionRoute
+  '/onboarding': typeof OnboardingRoute
+  '/settings': typeof SettingsRoute
+  '/signin': typeof SigninRoute
+  '/_tabs/coach': typeof TabsCoachRoute
+  '/_tabs/profile': typeof TabsProfileRoute
+  '/_tabs/progress': typeof TabsProgressRoute
+  '/_tabs/workout': typeof TabsWorkoutRoute
+  '/_tabs/': typeof TabsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/achievements'
+    | '/nutrition'
+    | '/onboarding'
+    | '/settings'
+    | '/signin'
+    | '/coach'
+    | '/profile'
+    | '/progress'
+    | '/workout'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/achievements'
+    | '/nutrition'
+    | '/onboarding'
+    | '/settings'
+    | '/signin'
+    | '/coach'
+    | '/profile'
+    | '/progress'
+    | '/workout'
+    | '/'
+  id:
+    | '__root__'
+    | '/_tabs'
+    | '/achievements'
+    | '/nutrition'
+    | '/onboarding'
+    | '/settings'
+    | '/signin'
+    | '/_tabs/coach'
+    | '/_tabs/profile'
+    | '/_tabs/progress'
+    | '/_tabs/workout'
+    | '/_tabs/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  TabsRoute: typeof TabsRouteWithChildren
+  AchievementsRoute: typeof AchievementsRoute
+  NutritionRoute: typeof NutritionRoute
+  OnboardingRoute: typeof OnboardingRoute
+  SettingsRoute: typeof SettingsRoute
+  SigninRoute: typeof SigninRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/signin': {
+      id: '/signin'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof SigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nutrition': {
+      id: '/nutrition'
+      path: '/nutrition'
+      fullPath: '/nutrition'
+      preLoaderRoute: typeof NutritionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/achievements': {
+      id: '/achievements'
+      path: '/achievements'
+      fullPath: '/achievements'
+      preLoaderRoute: typeof AchievementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_tabs': {
+      id: '/_tabs'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof TabsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_tabs/': {
+      id: '/_tabs/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof TabsIndexRouteImport
+      parentRoute: typeof TabsRoute
+    }
+    '/_tabs/workout': {
+      id: '/_tabs/workout'
+      path: '/workout'
+      fullPath: '/workout'
+      preLoaderRoute: typeof TabsWorkoutRouteImport
+      parentRoute: typeof TabsRoute
+    }
+    '/_tabs/progress': {
+      id: '/_tabs/progress'
+      path: '/progress'
+      fullPath: '/progress'
+      preLoaderRoute: typeof TabsProgressRouteImport
+      parentRoute: typeof TabsRoute
+    }
+    '/_tabs/profile': {
+      id: '/_tabs/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof TabsProfileRouteImport
+      parentRoute: typeof TabsRoute
+    }
+    '/_tabs/coach': {
+      id: '/_tabs/coach'
+      path: '/coach'
+      fullPath: '/coach'
+      preLoaderRoute: typeof TabsCoachRouteImport
+      parentRoute: typeof TabsRoute
     }
   }
 }
 
+interface TabsRouteChildren {
+  TabsCoachRoute: typeof TabsCoachRoute
+  TabsProfileRoute: typeof TabsProfileRoute
+  TabsProgressRoute: typeof TabsProgressRoute
+  TabsWorkoutRoute: typeof TabsWorkoutRoute
+  TabsIndexRoute: typeof TabsIndexRoute
+}
+
+const TabsRouteChildren: TabsRouteChildren = {
+  TabsCoachRoute: TabsCoachRoute,
+  TabsProfileRoute: TabsProfileRoute,
+  TabsProgressRoute: TabsProgressRoute,
+  TabsWorkoutRoute: TabsWorkoutRoute,
+  TabsIndexRoute: TabsIndexRoute,
+}
+
+const TabsRouteWithChildren = TabsRoute._addFileChildren(TabsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  TabsRoute: TabsRouteWithChildren,
+  AchievementsRoute: AchievementsRoute,
+  NutritionRoute: NutritionRoute,
+  OnboardingRoute: OnboardingRoute,
+  SettingsRoute: SettingsRoute,
+  SigninRoute: SigninRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
