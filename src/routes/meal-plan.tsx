@@ -21,7 +21,7 @@ function MealPlan() {
         <div className="flex items-center justify-between">
           <Link to="/nutrition" className="size-10 -ml-2 flex items-center justify-center"><ChevronLeft className="size-5" /></Link>
           <h1 className="text-base font-semibold">Meal plan</h1>
-          <button className="size-10 -mr-2 flex items-center justify-center"><RefreshCw className="size-4.5" /></button>
+          <button className="size-10 -mr-2 flex items-center justify-center"><RefreshCw className="size-[18px]" /></button>
         </div>
 
         <div className="mt-4 surface p-5">

@@ -17,6 +17,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as NutritionRouteImport } from './routes/nutrition'
 import { Route as MeasurementsRouteImport } from './routes/measurements'
+import { Route as MealPlanRouteImport } from './routes/meal-plan'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as FriendsRouteImport } from './routes/friends'
@@ -67,6 +68,11 @@ const NutritionRoute = NutritionRouteImport.update({
 const MeasurementsRoute = MeasurementsRouteImport.update({
   id: '/measurements',
   path: '/measurements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MealPlanRoute = MealPlanRouteImport.update({
+  id: '/meal-plan',
+  path: '/meal-plan',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeaderboardRoute = LeaderboardRouteImport.update({
@@ -131,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/friends': typeof FriendsRoute
   '/history': typeof HistoryRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/meal-plan': typeof MealPlanRoute
   '/measurements': typeof MeasurementsRoute
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
@@ -150,6 +157,7 @@ export interface FileRoutesByTo {
   '/friends': typeof FriendsRoute
   '/history': typeof HistoryRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/meal-plan': typeof MealPlanRoute
   '/measurements': typeof MeasurementsRoute
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
@@ -172,6 +180,7 @@ export interface FileRoutesById {
   '/friends': typeof FriendsRoute
   '/history': typeof HistoryRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/meal-plan': typeof MealPlanRoute
   '/measurements': typeof MeasurementsRoute
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
@@ -195,6 +204,7 @@ export interface FileRouteTypes {
     | '/friends'
     | '/history'
     | '/leaderboard'
+    | '/meal-plan'
     | '/measurements'
     | '/nutrition'
     | '/onboarding'
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
     | '/friends'
     | '/history'
     | '/leaderboard'
+    | '/meal-plan'
     | '/measurements'
     | '/nutrition'
     | '/onboarding'
@@ -235,6 +246,7 @@ export interface FileRouteTypes {
     | '/friends'
     | '/history'
     | '/leaderboard'
+    | '/meal-plan'
     | '/measurements'
     | '/nutrition'
     | '/onboarding'
@@ -257,6 +269,7 @@ export interface RootRouteChildren {
   FriendsRoute: typeof FriendsRoute
   HistoryRoute: typeof HistoryRoute
   LeaderboardRoute: typeof LeaderboardRoute
+  MealPlanRoute: typeof MealPlanRoute
   MeasurementsRoute: typeof MeasurementsRoute
   NutritionRoute: typeof NutritionRoute
   OnboardingRoute: typeof OnboardingRoute
@@ -323,6 +336,13 @@ declare module '@tanstack/react-router' {
       path: '/measurements'
       fullPath: '/measurements'
       preLoaderRoute: typeof MeasurementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/meal-plan': {
+      id: '/meal-plan'
+      path: '/meal-plan'
+      fullPath: '/meal-plan'
+      preLoaderRoute: typeof MealPlanRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leaderboard': {
@@ -430,6 +450,7 @@ const rootRouteChildren: RootRouteChildren = {
   FriendsRoute: FriendsRoute,
   HistoryRoute: HistoryRoute,
   LeaderboardRoute: LeaderboardRoute,
+  MealPlanRoute: MealPlanRoute,
   MeasurementsRoute: MeasurementsRoute,
   NutritionRoute: NutritionRoute,
   OnboardingRoute: OnboardingRoute,
