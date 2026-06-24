@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SigninRouteImport } from './routes/signin'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as TabsRouteImport } from './routes/_tabs'
 import { Route as TabsIndexRouteImport } from './routes/_tabs.index'
@@ -17,6 +18,11 @@ import { Route as TabsProgressRouteImport } from './routes/_tabs.progress'
 import { Route as TabsProfileRouteImport } from './routes/_tabs.profile'
 import { Route as TabsCoachRouteImport } from './routes/_tabs.coach'
 
+const SigninRoute = SigninRouteImport.update({
+  id: '/signin',
+  path: '/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -55,6 +61,7 @@ const TabsCoachRoute = TabsCoachRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof TabsIndexRoute
   '/onboarding': typeof OnboardingRoute
+  '/signin': typeof SigninRoute
   '/coach': typeof TabsCoachRoute
   '/profile': typeof TabsProfileRoute
   '/progress': typeof TabsProgressRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
+  '/signin': typeof SigninRoute
   '/coach': typeof TabsCoachRoute
   '/profile': typeof TabsProfileRoute
   '/progress': typeof TabsProgressRoute
@@ -72,6 +80,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_tabs': typeof TabsRouteWithChildren
   '/onboarding': typeof OnboardingRoute
+  '/signin': typeof SigninRoute
   '/_tabs/coach': typeof TabsCoachRoute
   '/_tabs/profile': typeof TabsProfileRoute
   '/_tabs/progress': typeof TabsProgressRoute
@@ -83,16 +92,25 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/onboarding'
+    | '/signin'
     | '/coach'
     | '/profile'
     | '/progress'
     | '/workout'
   fileRoutesByTo: FileRoutesByTo
-  to: '/onboarding' | '/coach' | '/profile' | '/progress' | '/workout' | '/'
+  to:
+    | '/onboarding'
+    | '/signin'
+    | '/coach'
+    | '/profile'
+    | '/progress'
+    | '/workout'
+    | '/'
   id:
     | '__root__'
     | '/_tabs'
     | '/onboarding'
+    | '/signin'
     | '/_tabs/coach'
     | '/_tabs/profile'
     | '/_tabs/progress'
@@ -103,10 +121,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   TabsRoute: typeof TabsRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
+  SigninRoute: typeof SigninRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signin': {
+      id: '/signin'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof SigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/onboarding': {
       id: '/onboarding'
       path: '/onboarding'
@@ -180,6 +206,7 @@ const TabsRouteWithChildren = TabsRoute._addFileChildren(TabsRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   TabsRoute: TabsRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
+  SigninRoute: SigninRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
