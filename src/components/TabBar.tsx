@@ -1,13 +1,14 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Dumbbell, Sparkles, BarChart3, User } from "lucide-react";
 
-const tabs = [
+type Tab = { to: string; label: string; icon: typeof Home; exact?: boolean };
+const tabs: Tab[] = [
   { to: "/", label: "Home", icon: Home, exact: true },
   { to: "/workout", label: "Workout", icon: Dumbbell },
   { to: "/coach", label: "AI Coach", icon: Sparkles },
   { to: "/progress", label: "Progress", icon: BarChart3 },
   { to: "/profile", label: "Profile", icon: User },
-] as const;
+];
 
 export function TabBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -19,7 +20,7 @@ export function TabBar() {
           return (
             <Link
               key={to}
-              to={to}
+              to={to as "/"}
               aria-label={label}
               className={`flex flex-col items-center justify-center gap-0.5 rounded-full transition-all duration-300 px-3 py-2 ${
                 active ? "text-accent" : "text-foreground/50"
