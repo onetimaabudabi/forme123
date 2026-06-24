@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronRight, Trophy, Apple, Settings, Bell, Shield, HelpCircle, LogOut } from "lucide-react";
+import { ChevronRight, Trophy, Apple, Settings, Bell, Shield, HelpCircle, LogOut, Flame, Calendar, Users, Crown, History, Ruler, Moon, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/_tabs/profile")({
   head: () => ({ meta: [{ title: "Profile — Forme" }] }),
@@ -46,7 +46,22 @@ function Profile() {
 
       <div className="mt-6 surface overflow-hidden divide-y divide-black/5">
         <Row to="/achievements" icon={Trophy} label="Achievements" hint="7 unlocked" />
+        <Row to="/challenges" icon={Flame} label="Daily challenges" hint="2 / 5" />
+        <Row to="/streak" icon={Calendar} label="Streak calendar" hint="12 days" />
+        <Row to="/leaderboard" icon={Crown} label="Leaderboard" hint="#3" />
+        <Row to="/friends" icon={Users} label="Friends" />
+      </div>
+
+      <div className="mt-4 surface overflow-hidden divide-y divide-black/5">
+        <Row to="/history" icon={History} label="Workout history" />
+        <Row to="/measurements" icon={Ruler} label="Body measurements" />
+        <Row to="/sleep" icon={Moon} label="Sleep tracking" />
+        <Row to="/meal-plan" icon={Sparkles} label="AI meal plans" />
         <Row to="/nutrition" icon={Apple} label="Nutrition" />
+      </div>
+
+      <div className="mt-4 surface overflow-hidden divide-y divide-black/5">
+        <Row to="/subscription" icon={Crown} label="Forme Pro" hint="Active" />
         <Row to="/settings" icon={Settings} label="Settings" />
       </div>
 
