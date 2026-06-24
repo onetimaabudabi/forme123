@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SigninRouteImport } from './routes/signin'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as NutritionRouteImport } from './routes/nutrition'
 import { Route as AchievementsRouteImport } from './routes/achievements'
@@ -23,6 +24,11 @@ import { Route as TabsCoachRouteImport } from './routes/_tabs.coach'
 const SigninRoute = SigninRouteImport.update({
   id: '/signin',
   path: '/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/achievements': typeof AchievementsRoute
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
+  '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/coach': typeof TabsCoachRoute
   '/profile': typeof TabsProfileRoute
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/achievements': typeof AchievementsRoute
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
+  '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/coach': typeof TabsCoachRoute
   '/profile': typeof TabsProfileRoute
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/achievements': typeof AchievementsRoute
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
+  '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/_tabs/coach': typeof TabsCoachRoute
   '/_tabs/profile': typeof TabsProfileRoute
@@ -112,6 +121,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/nutrition'
     | '/onboarding'
+    | '/settings'
     | '/signin'
     | '/coach'
     | '/profile'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/nutrition'
     | '/onboarding'
+    | '/settings'
     | '/signin'
     | '/coach'
     | '/profile'
@@ -134,6 +145,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/nutrition'
     | '/onboarding'
+    | '/settings'
     | '/signin'
     | '/_tabs/coach'
     | '/_tabs/profile'
@@ -147,6 +159,7 @@ export interface RootRouteChildren {
   AchievementsRoute: typeof AchievementsRoute
   NutritionRoute: typeof NutritionRoute
   OnboardingRoute: typeof OnboardingRoute
+  SettingsRoute: typeof SettingsRoute
   SigninRoute: typeof SigninRoute
 }
 
@@ -157,6 +170,13 @@ declare module '@tanstack/react-router' {
       path: '/signin'
       fullPath: '/signin'
       preLoaderRoute: typeof SigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -248,6 +268,7 @@ const rootRouteChildren: RootRouteChildren = {
   AchievementsRoute: AchievementsRoute,
   NutritionRoute: NutritionRoute,
   OnboardingRoute: OnboardingRoute,
+  SettingsRoute: SettingsRoute,
   SigninRoute: SigninRoute,
 }
 export const routeTree = rootRouteImport
