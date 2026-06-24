@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as StreakRouteImport } from './routes/streak'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
@@ -22,6 +23,11 @@ import { Route as TabsProgressRouteImport } from './routes/_tabs.progress'
 import { Route as TabsProfileRouteImport } from './routes/_tabs.profile'
 import { Route as TabsCoachRouteImport } from './routes/_tabs.coach'
 
+const StreakRoute = StreakRouteImport.update({
+  id: '/streak',
+  path: '/streak',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SigninRoute = SigninRouteImport.update({
   id: '/signin',
   path: '/signin',
@@ -90,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
+  '/streak': typeof StreakRoute
   '/coach': typeof TabsCoachRoute
   '/profile': typeof TabsProfileRoute
   '/progress': typeof TabsProgressRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
+  '/streak': typeof StreakRoute
   '/coach': typeof TabsCoachRoute
   '/profile': typeof TabsProfileRoute
   '/progress': typeof TabsProgressRoute
@@ -117,6 +125,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
+  '/streak': typeof StreakRoute
   '/_tabs/coach': typeof TabsCoachRoute
   '/_tabs/profile': typeof TabsProfileRoute
   '/_tabs/progress': typeof TabsProgressRoute
@@ -133,6 +142,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/settings'
     | '/signin'
+    | '/streak'
     | '/coach'
     | '/profile'
     | '/progress'
@@ -145,6 +155,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/settings'
     | '/signin'
+    | '/streak'
     | '/coach'
     | '/profile'
     | '/progress'
@@ -159,6 +170,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/settings'
     | '/signin'
+    | '/streak'
     | '/_tabs/coach'
     | '/_tabs/profile'
     | '/_tabs/progress'
@@ -174,10 +186,18 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   SettingsRoute: typeof SettingsRoute
   SigninRoute: typeof SigninRoute
+  StreakRoute: typeof StreakRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/streak': {
+      id: '/streak'
+      path: '/streak'
+      fullPath: '/streak'
+      preLoaderRoute: typeof StreakRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signin': {
       id: '/signin'
       path: '/signin'
@@ -291,6 +311,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   SettingsRoute: SettingsRoute,
   SigninRoute: SigninRoute,
+  StreakRoute: StreakRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
