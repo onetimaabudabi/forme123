@@ -50,7 +50,7 @@ function Measurements() {
           })}
         </div>
 
-        <button className="mt-5 w-full h-13 py-4 rounded-full bg-black text-white font-semibold text-sm active:scale-[0.98] transition">
+        <button className="mt-5 w-full py-4 rounded-full bg-black text-white font-semibold text-sm active:scale-[0.98] transition">
           Log new measurement
         </button>
       </div>
