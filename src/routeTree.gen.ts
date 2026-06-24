@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TabsRouteImport } from './routes/_tabs'
 import { Route as TabsIndexRouteImport } from './routes/_tabs.index'
 import { Route as TabsWorkoutRouteImport } from './routes/_tabs.workout'
+import { Route as TabsCoachRouteImport } from './routes/_tabs.coach'
 
 const TabsRoute = TabsRouteImport.update({
   id: '/_tabs',
@@ -27,27 +28,35 @@ const TabsWorkoutRoute = TabsWorkoutRouteImport.update({
   path: '/workout',
   getParentRoute: () => TabsRoute,
 } as any)
+const TabsCoachRoute = TabsCoachRouteImport.update({
+  id: '/coach',
+  path: '/coach',
+  getParentRoute: () => TabsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof TabsIndexRoute
+  '/coach': typeof TabsCoachRoute
   '/workout': typeof TabsWorkoutRoute
 }
 export interface FileRoutesByTo {
+  '/coach': typeof TabsCoachRoute
   '/workout': typeof TabsWorkoutRoute
   '/': typeof TabsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_tabs': typeof TabsRouteWithChildren
+  '/_tabs/coach': typeof TabsCoachRoute
   '/_tabs/workout': typeof TabsWorkoutRoute
   '/_tabs/': typeof TabsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/workout'
+  fullPaths: '/' | '/coach' | '/workout'
   fileRoutesByTo: FileRoutesByTo
-  to: '/workout' | '/'
-  id: '__root__' | '/_tabs' | '/_tabs/workout' | '/_tabs/'
+  to: '/coach' | '/workout' | '/'
+  id: '__root__' | '/_tabs' | '/_tabs/coach' | '/_tabs/workout' | '/_tabs/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,15 +86,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TabsWorkoutRouteImport
       parentRoute: typeof TabsRoute
     }
+    '/_tabs/coach': {
+      id: '/_tabs/coach'
+      path: '/coach'
+      fullPath: '/coach'
+      preLoaderRoute: typeof TabsCoachRouteImport
+      parentRoute: typeof TabsRoute
+    }
   }
 }
 
 interface TabsRouteChildren {
+  TabsCoachRoute: typeof TabsCoachRoute
   TabsWorkoutRoute: typeof TabsWorkoutRoute
   TabsIndexRoute: typeof TabsIndexRoute
 }
 
 const TabsRouteChildren: TabsRouteChildren = {
+  TabsCoachRoute: TabsCoachRoute,
   TabsWorkoutRoute: TabsWorkoutRoute,
   TabsIndexRoute: TabsIndexRoute,
 }
