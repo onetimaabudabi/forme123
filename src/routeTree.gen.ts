@@ -15,6 +15,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as NutritionRouteImport } from './routes/nutrition'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as HistoryRouteImport } from './routes/history'
 import { Route as FriendsRouteImport } from './routes/friends'
 import { Route as ChallengesRouteImport } from './routes/challenges'
 import { Route as AchievementsRouteImport } from './routes/achievements'
@@ -53,6 +54,11 @@ const NutritionRoute = NutritionRouteImport.update({
 const LeaderboardRoute = LeaderboardRouteImport.update({
   id: '/leaderboard',
   path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HistoryRoute = HistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FriendsRoute = FriendsRouteImport.update({
@@ -105,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/achievements': typeof AchievementsRoute
   '/challenges': typeof ChallengesRoute
   '/friends': typeof FriendsRoute
+  '/history': typeof HistoryRoute
   '/leaderboard': typeof LeaderboardRoute
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/achievements': typeof AchievementsRoute
   '/challenges': typeof ChallengesRoute
   '/friends': typeof FriendsRoute
+  '/history': typeof HistoryRoute
   '/leaderboard': typeof LeaderboardRoute
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
@@ -138,6 +146,7 @@ export interface FileRoutesById {
   '/achievements': typeof AchievementsRoute
   '/challenges': typeof ChallengesRoute
   '/friends': typeof FriendsRoute
+  '/history': typeof HistoryRoute
   '/leaderboard': typeof LeaderboardRoute
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
@@ -157,6 +166,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/challenges'
     | '/friends'
+    | '/history'
     | '/leaderboard'
     | '/nutrition'
     | '/onboarding'
@@ -172,6 +182,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/challenges'
     | '/friends'
+    | '/history'
     | '/leaderboard'
     | '/nutrition'
     | '/onboarding'
@@ -189,6 +200,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/challenges'
     | '/friends'
+    | '/history'
     | '/leaderboard'
     | '/nutrition'
     | '/onboarding'
@@ -207,6 +219,7 @@ export interface RootRouteChildren {
   AchievementsRoute: typeof AchievementsRoute
   ChallengesRoute: typeof ChallengesRoute
   FriendsRoute: typeof FriendsRoute
+  HistoryRoute: typeof HistoryRoute
   LeaderboardRoute: typeof LeaderboardRoute
   NutritionRoute: typeof NutritionRoute
   OnboardingRoute: typeof OnboardingRoute
@@ -257,6 +270,13 @@ declare module '@tanstack/react-router' {
       path: '/leaderboard'
       fullPath: '/leaderboard'
       preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/history': {
+      id: '/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof HistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/friends': {
@@ -348,6 +368,7 @@ const rootRouteChildren: RootRouteChildren = {
   AchievementsRoute: AchievementsRoute,
   ChallengesRoute: ChallengesRoute,
   FriendsRoute: FriendsRoute,
+  HistoryRoute: HistoryRoute,
   LeaderboardRoute: LeaderboardRoute,
   NutritionRoute: NutritionRoute,
   OnboardingRoute: OnboardingRoute,
