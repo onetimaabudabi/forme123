@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SubscriptionRouteImport } from './routes/subscription'
 import { Route as StreakRouteImport } from './routes/streak'
 import { Route as SleepRouteImport } from './routes/sleep'
 import { Route as SigninRouteImport } from './routes/signin'
@@ -28,6 +29,11 @@ import { Route as TabsProgressRouteImport } from './routes/_tabs.progress'
 import { Route as TabsProfileRouteImport } from './routes/_tabs.profile'
 import { Route as TabsCoachRouteImport } from './routes/_tabs.coach'
 
+const SubscriptionRoute = SubscriptionRouteImport.update({
+  id: '/subscription',
+  path: '/subscription',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StreakRoute = StreakRouteImport.update({
   id: '/streak',
   path: '/streak',
@@ -132,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/signin': typeof SigninRoute
   '/sleep': typeof SleepRoute
   '/streak': typeof StreakRoute
+  '/subscription': typeof SubscriptionRoute
   '/coach': typeof TabsCoachRoute
   '/profile': typeof TabsProfileRoute
   '/progress': typeof TabsProgressRoute
@@ -150,6 +157,7 @@ export interface FileRoutesByTo {
   '/signin': typeof SigninRoute
   '/sleep': typeof SleepRoute
   '/streak': typeof StreakRoute
+  '/subscription': typeof SubscriptionRoute
   '/coach': typeof TabsCoachRoute
   '/profile': typeof TabsProfileRoute
   '/progress': typeof TabsProgressRoute
@@ -171,6 +179,7 @@ export interface FileRoutesById {
   '/signin': typeof SigninRoute
   '/sleep': typeof SleepRoute
   '/streak': typeof StreakRoute
+  '/subscription': typeof SubscriptionRoute
   '/_tabs/coach': typeof TabsCoachRoute
   '/_tabs/profile': typeof TabsProfileRoute
   '/_tabs/progress': typeof TabsProgressRoute
@@ -193,6 +202,7 @@ export interface FileRouteTypes {
     | '/signin'
     | '/sleep'
     | '/streak'
+    | '/subscription'
     | '/coach'
     | '/profile'
     | '/progress'
@@ -211,6 +221,7 @@ export interface FileRouteTypes {
     | '/signin'
     | '/sleep'
     | '/streak'
+    | '/subscription'
     | '/coach'
     | '/profile'
     | '/progress'
@@ -231,6 +242,7 @@ export interface FileRouteTypes {
     | '/signin'
     | '/sleep'
     | '/streak'
+    | '/subscription'
     | '/_tabs/coach'
     | '/_tabs/profile'
     | '/_tabs/progress'
@@ -252,10 +264,18 @@ export interface RootRouteChildren {
   SigninRoute: typeof SigninRoute
   SleepRoute: typeof SleepRoute
   StreakRoute: typeof StreakRoute
+  SubscriptionRoute: typeof SubscriptionRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/subscription': {
+      id: '/subscription'
+      path: '/subscription'
+      fullPath: '/subscription'
+      preLoaderRoute: typeof SubscriptionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/streak': {
       id: '/streak'
       path: '/streak'
@@ -417,6 +437,7 @@ const rootRouteChildren: RootRouteChildren = {
   SigninRoute: SigninRoute,
   SleepRoute: SleepRoute,
   StreakRoute: StreakRoute,
+  SubscriptionRoute: SubscriptionRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
