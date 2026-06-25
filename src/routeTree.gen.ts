@@ -14,6 +14,7 @@ import { Route as StreakRouteImport } from './routes/streak'
 import { Route as SleepRouteImport } from './routes/sleep'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ProfileSetupRouteImport } from './routes/profile-setup'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as NutritionRouteImport } from './routes/nutrition'
 import { Route as MeasurementsRouteImport } from './routes/measurements'
@@ -21,6 +22,7 @@ import { Route as MealPlanRouteImport } from './routes/meal-plan'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as FriendsRouteImport } from './routes/friends'
+import { Route as EditProfileRouteImport } from './routes/edit-profile'
 import { Route as ChallengesRouteImport } from './routes/challenges'
 import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as TabsRouteImport } from './routes/_tabs'
@@ -53,6 +55,11 @@ const SigninRoute = SigninRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileSetupRoute = ProfileSetupRouteImport.update({
+  id: '/profile-setup',
+  path: '/profile-setup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -88,6 +95,11 @@ const HistoryRoute = HistoryRouteImport.update({
 const FriendsRoute = FriendsRouteImport.update({
   id: '/friends',
   path: '/friends',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EditProfileRoute = EditProfileRouteImport.update({
+  id: '/edit-profile',
+  path: '/edit-profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChallengesRoute = ChallengesRouteImport.update({
@@ -134,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/': typeof TabsIndexRoute
   '/achievements': typeof AchievementsRoute
   '/challenges': typeof ChallengesRoute
+  '/edit-profile': typeof EditProfileRoute
   '/friends': typeof FriendsRoute
   '/history': typeof HistoryRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -141,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/measurements': typeof MeasurementsRoute
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
+  '/profile-setup': typeof ProfileSetupRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/sleep': typeof SleepRoute
@@ -154,6 +168,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/achievements': typeof AchievementsRoute
   '/challenges': typeof ChallengesRoute
+  '/edit-profile': typeof EditProfileRoute
   '/friends': typeof FriendsRoute
   '/history': typeof HistoryRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -161,6 +176,7 @@ export interface FileRoutesByTo {
   '/measurements': typeof MeasurementsRoute
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
+  '/profile-setup': typeof ProfileSetupRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/sleep': typeof SleepRoute
@@ -177,6 +193,7 @@ export interface FileRoutesById {
   '/_tabs': typeof TabsRouteWithChildren
   '/achievements': typeof AchievementsRoute
   '/challenges': typeof ChallengesRoute
+  '/edit-profile': typeof EditProfileRoute
   '/friends': typeof FriendsRoute
   '/history': typeof HistoryRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -184,6 +201,7 @@ export interface FileRoutesById {
   '/measurements': typeof MeasurementsRoute
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
+  '/profile-setup': typeof ProfileSetupRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/sleep': typeof SleepRoute
@@ -201,6 +219,7 @@ export interface FileRouteTypes {
     | '/'
     | '/achievements'
     | '/challenges'
+    | '/edit-profile'
     | '/friends'
     | '/history'
     | '/leaderboard'
@@ -208,6 +227,7 @@ export interface FileRouteTypes {
     | '/measurements'
     | '/nutrition'
     | '/onboarding'
+    | '/profile-setup'
     | '/settings'
     | '/signin'
     | '/sleep'
@@ -221,6 +241,7 @@ export interface FileRouteTypes {
   to:
     | '/achievements'
     | '/challenges'
+    | '/edit-profile'
     | '/friends'
     | '/history'
     | '/leaderboard'
@@ -228,6 +249,7 @@ export interface FileRouteTypes {
     | '/measurements'
     | '/nutrition'
     | '/onboarding'
+    | '/profile-setup'
     | '/settings'
     | '/signin'
     | '/sleep'
@@ -243,6 +265,7 @@ export interface FileRouteTypes {
     | '/_tabs'
     | '/achievements'
     | '/challenges'
+    | '/edit-profile'
     | '/friends'
     | '/history'
     | '/leaderboard'
@@ -250,6 +273,7 @@ export interface FileRouteTypes {
     | '/measurements'
     | '/nutrition'
     | '/onboarding'
+    | '/profile-setup'
     | '/settings'
     | '/signin'
     | '/sleep'
@@ -266,6 +290,7 @@ export interface RootRouteChildren {
   TabsRoute: typeof TabsRouteWithChildren
   AchievementsRoute: typeof AchievementsRoute
   ChallengesRoute: typeof ChallengesRoute
+  EditProfileRoute: typeof EditProfileRoute
   FriendsRoute: typeof FriendsRoute
   HistoryRoute: typeof HistoryRoute
   LeaderboardRoute: typeof LeaderboardRoute
@@ -273,6 +298,7 @@ export interface RootRouteChildren {
   MeasurementsRoute: typeof MeasurementsRoute
   NutritionRoute: typeof NutritionRoute
   OnboardingRoute: typeof OnboardingRoute
+  ProfileSetupRoute: typeof ProfileSetupRoute
   SettingsRoute: typeof SettingsRoute
   SigninRoute: typeof SigninRoute
   SleepRoute: typeof SleepRoute
@@ -315,6 +341,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile-setup': {
+      id: '/profile-setup'
+      path: '/profile-setup'
+      fullPath: '/profile-setup'
+      preLoaderRoute: typeof ProfileSetupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -364,6 +397,13 @@ declare module '@tanstack/react-router' {
       path: '/friends'
       fullPath: '/friends'
       preLoaderRoute: typeof FriendsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/edit-profile': {
+      id: '/edit-profile'
+      path: '/edit-profile'
+      fullPath: '/edit-profile'
+      preLoaderRoute: typeof EditProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/challenges': {
@@ -447,6 +487,7 @@ const rootRouteChildren: RootRouteChildren = {
   TabsRoute: TabsRouteWithChildren,
   AchievementsRoute: AchievementsRoute,
   ChallengesRoute: ChallengesRoute,
+  EditProfileRoute: EditProfileRoute,
   FriendsRoute: FriendsRoute,
   HistoryRoute: HistoryRoute,
   LeaderboardRoute: LeaderboardRoute,
@@ -454,6 +495,7 @@ const rootRouteChildren: RootRouteChildren = {
   MeasurementsRoute: MeasurementsRoute,
   NutritionRoute: NutritionRoute,
   OnboardingRoute: OnboardingRoute,
+  ProfileSetupRoute: ProfileSetupRoute,
   SettingsRoute: SettingsRoute,
   SigninRoute: SigninRoute,
   SleepRoute: SleepRoute,
@@ -463,13 +505,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

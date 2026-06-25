@@ -1,30 +1,52 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Sparkles, ArrowUp, Mic } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { addDoc, collection, onSnapshot, orderBy, query, Timestamp, where } from "firebase/firestore";
+import { getDb } from "@/lib/firebase";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_tabs/coach")({
   head: () => ({ meta: [{ title: "AI Coach — Forme" }] }),
   component: Coach,
 });
 
-type Msg = { role: "user" | "assistant"; text: string };
-
-const seed: Msg[] = [
-  { role: "assistant", text: "Good morning, Alex. I noticed you slept 7h 42m and hit your protein goal yesterday. Ready for today's session?" },
-  { role: "user", text: "Yeah but my shoulders are tight." },
-  { role: "assistant", text: "Let's swap the overhead press for landmine press today and add 5 min of band mobility. Your bench numbers won't suffer — promise." },
-];
+type Msg = { id: string; role: "user" | "assistant"; text: string };
 
 const suggestions = ["Plan my week", "Recovery tips", "Adjust my macros", "Why am I plateauing?"];
 
 function Coach() {
-  const [msgs, setMsgs] = useState<Msg[]>(seed);
+  const { user, profile } = useAuth();
+  const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
 
-  const send = (text: string) => {
-    if (!text.trim()) return;
-    setMsgs((m) => [...m, { role: "user", text }, { role: "assistant", text: "Got it — let me think through that for you…" }]);
+  useEffect(() => {
+    if (!user) return;
+    const q = query(
+      collection(getDb(), "messages"),
+      where("uid", "==", user.uid),
+      orderBy("createdAt", "asc"),
+    );
+    const unsub = onSnapshot(q, (snap) => {
+      setMsgs(snap.docs.map((d) => {
+        const data = d.data() as { role: "user" | "assistant"; text: string };
+        return { id: d.id, role: data.role, text: data.text };
+      }));
+    });
+    return () => unsub();
+  }, [user]);
+
+  const send = async (text: string) => {
+    if (!text.trim() || !user) return;
     setInput("");
+    const col = collection(getDb(), "messages");
+    await addDoc(col, { uid: user.uid, role: "user", text, createdAt: Timestamp.now() });
+    const goalReply: Record<string, string> = {
+      weight_loss: "Stay in a small calorie deficit and prioritise protein — you've got this.",
+      muscle_gain: "Push for progressive overload today and keep protein at 1.6g/kg.",
+      maintain: "Consistency beats intensity. Keep your routine steady today.",
+    };
+    const reply = profile ? goalReply[profile.goal] ?? "Got it — let's keep moving." : "Got it.";
+    await addDoc(col, { uid: user.uid, role: "assistant", text: reply, createdAt: Timestamp.now() });
   };
 
   return (
@@ -44,8 +66,11 @@ function Coach() {
       </div>
 
       <div className="flex-1 px-5 pb-40 space-y-3 overflow-y-auto no-scrollbar">
-        {msgs.map((m, i) => (
-          <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+        {msgs.length === 0 && (
+          <p className="text-center text-sm text-foreground/40 mt-10">Say hi to your AI coach.</p>
+        )}
+        {msgs.map((m) => (
+          <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
             <div
               className={`max-w-[80%] px-4 py-2.5 text-[15px] leading-snug ${
                 m.role === "user"
