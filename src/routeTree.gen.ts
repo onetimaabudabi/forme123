@@ -14,6 +14,7 @@ import { Route as StreakRouteImport } from './routes/streak'
 import { Route as SleepRouteImport } from './routes/sleep'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ProfileSetupRouteImport } from './routes/profile-setup'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as NutritionRouteImport } from './routes/nutrition'
 import { Route as MeasurementsRouteImport } from './routes/measurements'
@@ -53,6 +54,11 @@ const SigninRoute = SigninRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileSetupRoute = ProfileSetupRouteImport.update({
+  id: '/profile-setup',
+  path: '/profile-setup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/measurements': typeof MeasurementsRoute
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
+  '/profile-setup': typeof ProfileSetupRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/sleep': typeof SleepRoute
@@ -161,6 +168,7 @@ export interface FileRoutesByTo {
   '/measurements': typeof MeasurementsRoute
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
+  '/profile-setup': typeof ProfileSetupRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/sleep': typeof SleepRoute
@@ -184,6 +192,7 @@ export interface FileRoutesById {
   '/measurements': typeof MeasurementsRoute
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
+  '/profile-setup': typeof ProfileSetupRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/sleep': typeof SleepRoute
@@ -208,6 +217,7 @@ export interface FileRouteTypes {
     | '/measurements'
     | '/nutrition'
     | '/onboarding'
+    | '/profile-setup'
     | '/settings'
     | '/signin'
     | '/sleep'
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/measurements'
     | '/nutrition'
     | '/onboarding'
+    | '/profile-setup'
     | '/settings'
     | '/signin'
     | '/sleep'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/measurements'
     | '/nutrition'
     | '/onboarding'
+    | '/profile-setup'
     | '/settings'
     | '/signin'
     | '/sleep'
@@ -273,6 +285,7 @@ export interface RootRouteChildren {
   MeasurementsRoute: typeof MeasurementsRoute
   NutritionRoute: typeof NutritionRoute
   OnboardingRoute: typeof OnboardingRoute
+  ProfileSetupRoute: typeof ProfileSetupRoute
   SettingsRoute: typeof SettingsRoute
   SigninRoute: typeof SigninRoute
   SleepRoute: typeof SleepRoute
@@ -315,6 +328,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile-setup': {
+      id: '/profile-setup'
+      path: '/profile-setup'
+      fullPath: '/profile-setup'
+      preLoaderRoute: typeof ProfileSetupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -454,6 +474,7 @@ const rootRouteChildren: RootRouteChildren = {
   MeasurementsRoute: MeasurementsRoute,
   NutritionRoute: NutritionRoute,
   OnboardingRoute: OnboardingRoute,
+  ProfileSetupRoute: ProfileSetupRoute,
   SettingsRoute: SettingsRoute,
   SigninRoute: SigninRoute,
   SleepRoute: SleepRoute,

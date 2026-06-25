@@ -1,5 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronRight, Trophy, Apple, Settings, Bell, Shield, HelpCircle, LogOut, Flame, Calendar, Users, Crown, History, Ruler, Moon, Sparkles } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { ChevronRight, Trophy, Apple, Settings, Bell, Shield, HelpCircle, LogOut, Flame, Calendar, Users, Crown, History, Ruler, Moon, Sparkles, UserCog } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_tabs/profile")({
   head: () => ({ meta: [{ title: "Profile — Forme" }] }),
@@ -20,28 +21,50 @@ function Row({ to, icon: Icon, label, hint }: { to: string; icon: typeof Trophy;
 }
 
 function Profile() {
+  const { profile, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  if (!profile) return null;
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate({ to: "/signin" });
+  };
+
+  const goalLabel: Record<string, string> = {
+    weight_loss: "Weight Loss",
+    muscle_gain: "Muscle Gain",
+    maintain: "Maintain Fitness",
+  };
+
   return (
     <div className="px-6 pt-14">
       <div className="flex flex-col items-center text-center">
-        <div className="size-24 rounded-full bg-secondary flex items-center justify-center text-3xl font-bold">A</div>
-        <h1 className="mt-4 text-2xl font-bold tracking-tight">Alex Morgan</h1>
-        <p className="text-sm text-foreground/50">alex@forme.app</p>
+        <div className="size-24 rounded-full bg-secondary flex items-center justify-center text-3xl font-bold">
+          {profile.name?.charAt(0).toUpperCase() ?? "?"}
+        </div>
+        <h1 className="mt-4 text-2xl font-bold tracking-tight">{profile.name}</h1>
+        <p className="text-sm text-foreground/50">{profile.email}</p>
         <div className="mt-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black text-white text-xs font-semibold">
-          ✦ Forme Pro
+          ✦ {goalLabel[profile.goal] ?? "Forme"}
         </div>
       </div>
 
       <div className="mt-6 grid grid-cols-3 gap-3">
         {[
-          { v: "12", l: "Day streak" },
-          { v: "84", l: "Workouts" },
-          { v: "7", l: "Badges" },
+          { v: String(profile.streak ?? 0), l: "Day streak" },
+          { v: `${profile.weight}`, l: "Weight kg" },
+          { v: `${profile.height}`, l: "Height cm" },
         ].map((s) => (
           <div key={s.l} className="surface py-4 text-center">
             <p className="text-xl font-bold tracking-tight">{s.v}</p>
             <p className="text-[11px] text-foreground/50 mt-0.5 font-medium">{s.l}</p>
           </div>
         ))}
+      </div>
+
+      <div className="mt-6 surface overflow-hidden divide-y divide-black/5">
+        <Row to="/edit-profile" icon={UserCog} label="Edit profile" hint="Name · weight · goal" />
       </div>
 
       <div className="mt-6 surface overflow-hidden divide-y divide-black/5">
@@ -71,9 +94,9 @@ function Profile() {
         <Row to="/settings" icon={HelpCircle} label="Help & support" />
       </div>
 
-      <Link to="/signin" className="mt-4 surface flex items-center justify-center gap-2 py-4 text-destructive font-semibold text-sm">
+      <button onClick={handleSignOut} className="mt-4 w-full surface flex items-center justify-center gap-2 py-4 text-destructive font-semibold text-sm">
         <LogOut className="size-4" /> Sign out
-      </Link>
+      </button>
     </div>
   );
 }
