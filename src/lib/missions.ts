@@ -1,6 +1,8 @@
 import { addDoc, collection, getDocs, limit, orderBy, query, updateDoc, where, doc, Timestamp } from "firebase/firestore";
 import { getDb } from "./firebase";
 import type { FitnessGoal } from "./auth";
+import { applyDailyCompletion, undoDailyCompletion } from "./streak";
+import { evaluateAchievements, unlockAchievement, countWorkouts } from "./achievements";
 
 export type Mission = {
   id: string;
@@ -46,4 +48,17 @@ export async function getOrCreateTodayMission(uid: string, goal: FitnessGoal): P
 
 export async function setMissionCompleted(id: string, completed: boolean) {
   await updateDoc(doc(getDb(), "missions", id), { completed });
+}
+
+/** Toggle today's mission, applying streak and achievement side effects. */
+export async function toggleMission(uid: string, id: string, completed: boolean): Promise<number> {
+  await setMissionCompleted(id, completed);
+  if (completed) {
+    const streak = await applyDailyCompletion(uid);
+    await unlockAchievement(uid, "first_mission");
+    const workoutCount = await countWorkouts(uid).catch(() => 0);
+    await evaluateAchievements(uid, { streak, workoutCount });
+    return streak;
+  }
+  return undoDailyCompletion(uid);
 }
