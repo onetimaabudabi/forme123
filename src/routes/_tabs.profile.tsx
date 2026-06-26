@@ -1,6 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ChevronRight, Trophy, Apple, Settings, Bell, Shield, HelpCircle, LogOut, Flame, Calendar, Users, Crown, History, Ruler, Moon, Sparkles, UserCog } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
+import { listAchievements, ACHIEVEMENTS } from "@/lib/achievements";
+import { listWorkoutHistory } from "@/lib/workouts";
 
 export const Route = createFileRoute("/_tabs/profile")({
   head: () => ({ meta: [{ title: "Profile — Forme" }] }),
@@ -23,6 +26,14 @@ function Row({ to, icon: Icon, label, hint }: { to: string; icon: typeof Trophy;
 function Profile() {
   const { profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const [unlocked, setUnlocked] = useState<number>(0);
+  const [workoutCount, setWorkoutCount] = useState<number>(0);
+
+  useEffect(() => {
+    if (!profile) return;
+    listAchievements(profile.uid).then((a) => setUnlocked(a.length)).catch(() => {});
+    listWorkoutHistory(profile.uid, 200).then((w) => setWorkoutCount(w.length)).catch(() => {});
+  }, [profile]);
 
   if (!profile) return null;
 
@@ -68,15 +79,15 @@ function Profile() {
       </div>
 
       <div className="mt-6 surface overflow-hidden divide-y divide-black/5">
-        <Row to="/achievements" icon={Trophy} label="Achievements" hint="7 unlocked" />
-        <Row to="/challenges" icon={Flame} label="Daily challenges" hint="2 / 5" />
-        <Row to="/streak" icon={Calendar} label="Streak calendar" hint="12 days" />
-        <Row to="/leaderboard" icon={Crown} label="Leaderboard" hint="#3" />
+        <Row to="/achievements" icon={Trophy} label="Achievements" hint={`${unlocked} / ${ACHIEVEMENTS.length}`} />
+        <Row to="/challenges" icon={Flame} label="Daily challenges" />
+        <Row to="/streak" icon={Calendar} label="Streak calendar" hint={`${profile.streak ?? 0} days`} />
+        <Row to="/leaderboard" icon={Crown} label="Leaderboard" />
         <Row to="/friends" icon={Users} label="Friends" />
       </div>
 
       <div className="mt-4 surface overflow-hidden divide-y divide-black/5">
-        <Row to="/history" icon={History} label="Workout history" />
+        <Row to="/history" icon={History} label="Workout history" hint={workoutCount ? String(workoutCount) : undefined} />
         <Row to="/measurements" icon={Ruler} label="Body measurements" />
         <Row to="/sleep" icon={Moon} label="Sleep tracking" />
         <Row to="/meal-plan" icon={Sparkles} label="AI meal plans" />
@@ -84,7 +95,7 @@ function Profile() {
       </div>
 
       <div className="mt-4 surface overflow-hidden divide-y divide-black/5">
-        <Row to="/subscription" icon={Crown} label="Forme Pro" hint="Active" />
+        <Row to="/subscription" icon={Crown} label="Forme Pro" />
         <Row to="/settings" icon={Settings} label="Settings" />
       </div>
 

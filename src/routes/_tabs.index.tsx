@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Flame, Scale, Sparkles, Apple, ChevronRight, Target, CheckCircle2, Circle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
-import { getOrCreateTodayMission, setMissionCompleted, type Mission } from "@/lib/missions";
+import { getOrCreateTodayMission, toggleMission as toggleMissionFs, type Mission } from "@/lib/missions";
+import { unlockAchievement } from "@/lib/achievements";
 
 export const Route = createFileRoute("/_tabs/")({
   head: () => ({
@@ -65,13 +66,14 @@ function Home() {
   useEffect(() => {
     if (!profile) return;
     getOrCreateTodayMission(profile.uid, profile.goal).then(setMission).catch(() => {});
+    unlockAchievement(profile.uid, "first_login").catch(() => {});
   }, [profile]);
 
-  const toggleMission = async () => {
+  const handleToggleMission = async () => {
     if (!mission) return;
     const next = !mission.completed;
     setMission({ ...mission, completed: next });
-    try { await setMissionCompleted(mission.id, next); } catch { /* ignore */ }
+    try { await toggleMissionFs(profile!.uid, mission.id, next); } catch { /* ignore */ }
   };
 
   if (!profile) return null;
@@ -99,7 +101,7 @@ function Home() {
               {mission?.title ?? "Loading mission…"}
             </p>
           </div>
-          <button onClick={toggleMission} className="shrink-0">
+          <button onClick={handleToggleMission} className="shrink-0">
             {mission?.completed ? (
               <CheckCircle2 className="size-14 text-accent" />
             ) : (
