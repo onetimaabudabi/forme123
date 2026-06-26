@@ -19,6 +19,7 @@ const features = [
 
 function Subscription() {
   const [plan, setPlan] = useState<"yearly" | "monthly">("yearly");
+  const [msg, setMsg] = useState<string | null>(null);
 
   return (
     <PhoneFrame>
@@ -74,10 +75,11 @@ function Subscription() {
           </button>
         </div>
 
-        <button className="mt-5 w-full h-14 rounded-full bg-black text-white font-semibold text-base active:scale-[0.98] transition">
+        <button onClick={() => setMsg("Payments coming soon — Forme Pro is in preview.")} className="mt-5 w-full h-14 rounded-full bg-black text-white font-semibold text-base active:scale-[0.98] transition">
           Start 7-day free trial
         </button>
         <p className="mt-3 text-center text-xs text-foreground/40">Cancel anytime · Restore purchase</p>
+        {msg && <p className="mt-3 text-center text-xs text-foreground/60">{msg}</p>}
       </div>
     </PhoneFrame>
   );
