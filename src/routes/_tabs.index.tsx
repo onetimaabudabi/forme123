@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Flame, Scale, Sparkles, Apple, ChevronRight, Target, CheckCircle2, Circle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
-import { getOrCreateTodayMission, setMissionCompleted, type Mission } from "@/lib/missions";
+import { getOrCreateTodayMission, toggleMission, type Mission } from "@/lib/missions";
+import { unlockAchievement } from "@/lib/achievements";
 
 export const Route = createFileRoute("/_tabs/")({
   head: () => ({
@@ -65,13 +66,17 @@ function Home() {
   useEffect(() => {
     if (!profile) return;
     getOrCreateTodayMission(profile.uid, profile.goal).then(setMission).catch(() => {});
+    unlockAchievement(profile.uid, "first_login").catch(() => {});
   }, [profile]);
 
   const toggleMission = async () => {
     if (!mission) return;
     const next = !mission.completed;
     setMission({ ...mission, completed: next });
-    try { await setMissionCompleted(mission.id, next); } catch { /* ignore */ }
+    try {
+      const { toggleMission: t } = await import("@/lib/missions");
+      await t(profile!.uid, mission.id, next);
+    } catch { /* ignore */ }
   };
 
   if (!profile) return null;
