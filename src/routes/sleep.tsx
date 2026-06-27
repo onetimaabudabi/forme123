@@ -20,6 +20,8 @@ function Sleep() {
   const { profile } = useAuth();
   const [items, setItems] = useState<SleepEntry[] | null>(null);
   const [hours, setHours] = useState("");
+  const [bedtime, setBedtime] = useState("");
+  const [wakeTime, setWakeTime] = useState("");
   const [show, setShow] = useState(false);
 
   const refresh = async () => {
@@ -31,10 +33,18 @@ function Sleep() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile) return;
-    const n = Number(hours);
+    let n = Number(hours);
+    // Auto-compute hours from bedtime/wake if hours blank
+    if ((!n || !Number.isFinite(n)) && bedtime && wakeTime) {
+      const [bh, bm] = bedtime.split(":").map(Number);
+      const [wh, wm] = wakeTime.split(":").map(Number);
+      let mins = (wh * 60 + wm) - (bh * 60 + bm);
+      if (mins < 0) mins += 24 * 60;
+      n = +(mins / 60).toFixed(2);
+    }
     if (!Number.isFinite(n) || n <= 0 || n > 16) return;
-    await logSleep(profile.uid, n);
-    setHours(""); setShow(false); await refresh();
+    await logSleep(profile.uid, n, { bedtime: bedtime || null, wakeTime: wakeTime || null });
+    setHours(""); setBedtime(""); setWakeTime(""); setShow(false); await refresh();
   };
   const remove = async (id: string) => { await deleteSleep(id); await refresh(); };
 
@@ -105,10 +115,20 @@ function Sleep() {
         )}
 
         {show && (
-          <form onSubmit={submit} className="mt-5 surface p-4 flex gap-2 items-center">
-            <input autoFocus type="number" step="0.1" min="0" max="16" value={hours} onChange={(e) => setHours(e.target.value)} placeholder="Hours slept" className="flex-1 h-11 rounded-xl bg-secondary px-3 text-sm" />
-            <button type="submit" className="h-11 px-4 rounded-xl bg-accent text-white text-sm font-semibold">Save</button>
-            <button type="button" onClick={() => setShow(false)} className="h-11 px-3 rounded-xl bg-secondary text-sm">Cancel</button>
+          <form onSubmit={submit} className="mt-5 surface p-4 space-y-2">
+            <div className="grid grid-cols-2 gap-2">
+              <label className="text-xs font-medium text-foreground/60">Bedtime
+                <input type="time" value={bedtime} onChange={(e) => setBedtime(e.target.value)} className="mt-1 w-full h-11 rounded-xl bg-secondary px-3 text-sm" />
+              </label>
+              <label className="text-xs font-medium text-foreground/60">Wake up
+                <input type="time" value={wakeTime} onChange={(e) => setWakeTime(e.target.value)} className="mt-1 w-full h-11 rounded-xl bg-secondary px-3 text-sm" />
+              </label>
+            </div>
+            <input type="number" step="0.1" min="0" max="16" value={hours} onChange={(e) => setHours(e.target.value)} placeholder="Or just enter hours slept" className="w-full h-11 rounded-xl bg-secondary px-3 text-sm" />
+            <div className="flex gap-2 pt-1">
+              <button type="submit" className="flex-1 h-11 rounded-full bg-accent text-white text-sm font-semibold">Save</button>
+              <button type="button" onClick={() => setShow(false)} className="h-11 px-4 rounded-full bg-secondary text-sm">Cancel</button>
+            </div>
           </form>
         )}
       </div>
