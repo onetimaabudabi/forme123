@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ChevronRight, Trophy, Apple, Settings, Bell, Shield, HelpCircle, LogOut, Flame, Calendar, Users, Crown, History, Ruler, Moon, Sparkles, UserCog } from "lucide-react";
+import { ChevronRight, Trophy, Apple, Settings, Bell, Shield, HelpCircle, LogOut, Flame, Calendar, Users, Crown, History, Ruler, Moon, Sparkles, UserCog, CalendarDays } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { listAchievements, ACHIEVEMENTS } from "@/lib/achievements";
@@ -79,6 +79,7 @@ function Profile() {
       </div>
 
       <div className="mt-6 surface overflow-hidden divide-y divide-black/5">
+        <Row to="/activity" icon={CalendarDays} label="Activity calendar" />
         <Row to="/achievements" icon={Trophy} label="Achievements" hint={`${unlocked} / ${ACHIEVEMENTS.length}`} />
         <Row to="/challenges" icon={Flame} label="Daily challenges" />
         <Row to="/streak" icon={Calendar} label="Streak calendar" hint={`${profile.streak ?? 0} days`} />
