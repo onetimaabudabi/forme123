@@ -156,15 +156,20 @@
 }
 
 @utility glass {
-  background-color: color-mix(in oklch, white 70%, transparent);
+  background-color: color-mix(in oklch, var(--background) 75%, transparent);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
-  border: 1px solid color-mix(in oklch, black 6%, transparent);
+  border: 1px solid var(--border);
 }
 
 @utility surface {
   background-color: var(--surface);
   border-radius: var(--radius-2xl);
+}
+
+.dark {
+  --surface: oklch(0.22 0.025 265);
+  --tab-bar: oklch(0.18 0.025 265 / 80%);
 }
 
 @utility no-scrollbar {
