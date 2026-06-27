@@ -6,14 +6,22 @@ export type SleepEntry = {
   uid: string;
   hours: number;
   quality?: "poor" | "ok" | "good" | "great";
+  bedtime?: string | null;   // HH:MM
+  wakeTime?: string | null;  // HH:MM
   createdAt: Date;
 };
 
-export async function logSleep(uid: string, hours: number, quality?: SleepEntry["quality"]) {
+export async function logSleep(
+  uid: string,
+  hours: number,
+  opts?: { quality?: SleepEntry["quality"]; bedtime?: string | null; wakeTime?: string | null },
+) {
   await addDoc(collection(getDb(), "sleep"), {
     uid,
     hours,
-    quality: quality ?? null,
+    quality: opts?.quality ?? null,
+    bedtime: opts?.bedtime ?? null,
+    wakeTime: opts?.wakeTime ?? null,
     createdAt: Timestamp.now(),
   });
 }
@@ -27,8 +35,8 @@ export async function listSleep(uid: string, max = 14): Promise<SleepEntry[]> {
   );
   const snap = await getDocs(q);
   return snap.docs.map((d) => {
-    const data = d.data() as { uid: string; hours: number; quality?: SleepEntry["quality"]; createdAt: Timestamp };
-    return { id: d.id, uid: data.uid, hours: data.hours, quality: data.quality, createdAt: data.createdAt.toDate() };
+    const data = d.data() as { uid: string; hours: number; quality?: SleepEntry["quality"]; bedtime?: string | null; wakeTime?: string | null; createdAt: Timestamp };
+    return { id: d.id, uid: data.uid, hours: data.hours, quality: data.quality, bedtime: data.bedtime ?? null, wakeTime: data.wakeTime ?? null, createdAt: data.createdAt.toDate() };
   });
 }
 
