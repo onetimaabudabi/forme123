@@ -14,6 +14,7 @@ export const Route = createFileRoute("/measurements")({
 const KEYS: { id: MeasurementKey; label: string }[] = [
   { id: "chest", label: "Chest" },
   { id: "waist", label: "Waist" },
+  { id: "neck", label: "Neck" },
   { id: "arms", label: "Arms" },
   { id: "hips", label: "Hips" },
   { id: "legs", label: "Legs" },
@@ -23,7 +24,7 @@ function Measurements() {
   const { profile } = useAuth();
   const [items, setItems] = useState<Measurement[] | null>(null);
   const [show, setShow] = useState(false);
-  const [form, setForm] = useState<Record<MeasurementKey, string>>({ chest: "", waist: "", arms: "", hips: "", legs: "" });
+  const [form, setForm] = useState<Record<MeasurementKey, string>>({ chest: "", waist: "", neck: "", arms: "", hips: "", legs: "" });
 
   const refresh = async () => {
     if (!profile) return;
@@ -42,7 +43,7 @@ function Measurements() {
     if (Object.keys(payload).length === 0) return;
     await addMeasurement(profile.uid, payload);
     unlockAchievement(profile.uid, "first_measurement").catch(() => {});
-    setForm({ chest: "", waist: "", arms: "", hips: "", legs: "" });
+    setForm({ chest: "", waist: "", neck: "", arms: "", hips: "", legs: "" });
     setShow(false);
     await refresh();
   };
