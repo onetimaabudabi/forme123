@@ -1,7 +1,7 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, limit, orderBy, query, Timestamp, where } from "firebase/firestore";
 import { getDb } from "./firebase";
 
-export type MeasurementKey = "chest" | "waist" | "arms" | "hips" | "legs";
+export type MeasurementKey = "chest" | "waist" | "arms" | "hips" | "legs" | "neck";
 
 export type Measurement = {
   id: string;
@@ -11,6 +11,7 @@ export type Measurement = {
   arms?: number;
   hips?: number;
   legs?: number;
+  neck?: number;
   createdAt: Date;
 };
 
@@ -40,6 +41,7 @@ export async function listMeasurements(uid: string, max = 50): Promise<Measureme
       arms: data.arms as number | undefined,
       hips: data.hips as number | undefined,
       legs: data.legs as number | undefined,
+      neck: data.neck as number | undefined,
       createdAt: data.createdAt.toDate(),
     };
   });
