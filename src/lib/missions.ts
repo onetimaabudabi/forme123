@@ -4,7 +4,7 @@ import type { FitnessGoal } from "./auth";
 import { applyDailyCompletion, undoDailyCompletion } from "./streak";
 import { evaluateAchievements, unlockAchievement, countWorkouts } from "./achievements";
 import { bumpStat, postActivity, setStat } from "./social";
-import { doc, getDoc } from "firebase/firestore";
+import { getDoc } from "firebase/firestore";
 
 export type Mission = {
   id: string;
