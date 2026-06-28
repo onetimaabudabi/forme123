@@ -35,7 +35,11 @@ function ActivityCalendar() {
 
   useEffect(() => {
     if (!profile) return;
-    getActivityRange(profile.uid, 180).then(setMap).catch(() => setMap(new Map()));
+    const load = () => getActivityRange(profile.uid, 180).then(setMap).catch(() => setMap(new Map()));
+    load();
+    const onFocus = () => load();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
   }, [profile]);
 
   const stats = useMemo(() => map ? monthStats(map, cursor.getFullYear(), cursor.getMonth()) : null, [map, cursor]);
