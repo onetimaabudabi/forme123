@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { getOrCreateTodayMission, toggleMission as toggleMissionFs, type Mission } from "@/lib/missions";
 import { unlockAchievement } from "@/lib/achievements";
+import { ensureStreakFresh } from "@/lib/streak";
 
 export const Route = createFileRoute("/_tabs/")({
   head: () => ({
@@ -65,6 +66,7 @@ function Home() {
 
   useEffect(() => {
     if (!profile) return;
+    ensureStreakFresh(profile.uid).catch(() => {});
     getOrCreateTodayMission(profile.uid, profile.goal).then(setMission).catch(() => {});
     unlockAchievement(profile.uid, "first_login").catch(() => {});
   }, [profile]);

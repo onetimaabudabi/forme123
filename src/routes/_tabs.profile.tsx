@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ChevronRight, Trophy, Apple, Settings, Bell, Shield, HelpCircle, LogOut, Flame, Calendar, Users, Crown, History, Ruler, Moon, Sparkles, UserCog, CalendarDays } from "lucide-react";
+import { ChevronRight, Trophy, Apple, Settings, Bell, Shield, HelpCircle, LogOut, Flame, Calendar, Users, Crown, History, Ruler, Moon, Sparkles, UserCog, CalendarDays, UserPlus, Rss } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { listAchievements, ACHIEVEMENTS } from "@/lib/achievements";
@@ -76,10 +76,13 @@ function Profile() {
 
       <div className="mt-6 surface overflow-hidden divide-y divide-black/5">
         <Row to="/edit-profile" icon={UserCog} label="Edit profile" hint="Name · weight · goal" />
+        <Row to="/add-friend" icon={UserPlus} label="Add friend" hint={profile.friendCode ?? undefined} />
+        <Row to="/notifications" icon={Bell} label="Notifications" />
       </div>
 
       <div className="mt-6 surface overflow-hidden divide-y divide-black/5">
         <Row to="/activity" icon={CalendarDays} label="Activity calendar" />
+        <Row to="/feed" icon={Rss} label="Friends feed" />
         <Row to="/achievements" icon={Trophy} label="Achievements" hint={`${unlocked} / ${ACHIEVEMENTS.length}`} />
         <Row to="/challenges" icon={Flame} label="Daily challenges" />
         <Row to="/streak" icon={Calendar} label="Streak calendar" hint={`${profile.streak ?? 0} days`} />

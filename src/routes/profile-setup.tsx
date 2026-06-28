@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { PhoneFrame } from "@/components/PhoneFrame";
 import { useAuth, saveUserProfile, type FitnessGoal } from "@/lib/auth";
+import { ensureUserIdentity } from "@/lib/usernames";
 
 export const Route = createFileRoute("/profile-setup")({
   head: () => ({ meta: [{ title: "Set up your profile — Forme" }] }),
@@ -55,6 +56,8 @@ function ProfileSetup() {
         weight: Number(weight),
         goal,
       });
+      // Assign username + friend code once profile exists.
+      await ensureUserIdentity(user.uid, name.trim()).catch(() => {});
       navigate({ to: "/" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save");

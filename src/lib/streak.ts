@@ -56,3 +56,21 @@ export async function recordFirstLogin(uid: string) {
   // increment counter for "First Login" tracking
   await updateDoc(ref, { loginCount: increment(1) }).catch(() => {});
 }
+
+/**
+ * Reset streak to 0 if user missed yesterday (lastCompletedAt is older than yesterday).
+ * Safe to call on every app open.
+ */
+export async function ensureStreakFresh(uid: string): Promise<void> {
+  const db = getDb();
+  const ref = doc(db, "users", uid);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return;
+  const data = snap.data() as { streak?: number; lastCompletedAt?: string };
+  if (!data.streak || data.streak <= 0) return;
+  const today = ymd();
+  if (data.lastCompletedAt === today) return;
+  if (data.lastCompletedAt && isYesterday(data.lastCompletedAt)) return;
+  // Missed a day — reset.
+  await updateDoc(ref, { streak: 0 });
+}

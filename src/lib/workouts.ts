@@ -1,7 +1,8 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, limit, orderBy, query, Timestamp, where } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDocs, limit, orderBy, query, Timestamp, updateDoc, where } from "firebase/firestore";
 import { getDb } from "./firebase";
 import { groqJSON, type GroqMessage } from "./groq";
 import type { UserProfile } from "./auth";
+import { bumpStat, postActivity } from "./social";
 
 export type Exercise = { name: string; sets: number; reps: string; rest: string };
 
@@ -13,6 +14,7 @@ export type WorkoutPlan = {
   estKcal: number;
   exercises: Exercise[];
   createdAt: Date;
+  archived?: boolean;
 };
 
 export type WorkoutLog = {
@@ -21,6 +23,7 @@ export type WorkoutLog = {
   title: string;
   durationMin: number;
   kcal: number;
+  exercises: Exercise[];
   completedAt: Date;
 };
 
@@ -30,21 +33,25 @@ export async function getActivePlan(uid: string): Promise<WorkoutPlan | null> {
     collection(db, "workout_plans"),
     where("uid", "==", uid),
     orderBy("createdAt", "desc"),
-    limit(1),
+    limit(5),
   );
   const snap = await getDocs(q);
   if (snap.empty) return null;
-  const d = snap.docs[0];
-  const data = d.data() as { uid: string; title: string; durationMin: number; estKcal: number; exercises: Exercise[]; createdAt: Timestamp };
-  return {
-    id: d.id,
-    uid: data.uid,
-    title: data.title,
-    durationMin: data.durationMin,
-    estKcal: data.estKcal,
-    exercises: data.exercises ?? [],
-    createdAt: data.createdAt.toDate(),
-  };
+  for (const d of snap.docs) {
+    const data = d.data() as { uid: string; title: string; durationMin: number; estKcal: number; exercises: Exercise[]; archived?: boolean; createdAt: Timestamp };
+    if (data.archived) continue;
+    return {
+      id: d.id,
+      uid: data.uid,
+      title: data.title,
+      durationMin: data.durationMin,
+      estKcal: data.estKcal,
+      exercises: data.exercises ?? [],
+      archived: false,
+      createdAt: data.createdAt.toDate(),
+    };
+  }
+  return null;
 }
 
 export async function generateWorkoutPlan(profile: UserProfile): Promise<WorkoutPlan> {
@@ -71,6 +78,7 @@ Return JSON: {"title": string, "durationMin": number, "estKcal": number, "exerci
     durationMin: parsed.durationMin,
     estKcal: parsed.estKcal,
     exercises: parsed.exercises,
+    archived: false,
     createdAt: Timestamp.now(),
   });
   return { id: created.id, uid: profile.uid, ...parsed, createdAt: new Date() };
@@ -83,9 +91,18 @@ export async function logCompletedWorkout(uid: string, plan: WorkoutPlan): Promi
     title: plan.title,
     durationMin: plan.durationMin,
     kcal: plan.estKcal,
+    exercises: plan.exercises,
     completedAt: Timestamp.now(),
   });
-  return { id: ref.id, uid, title: plan.title, durationMin: plan.durationMin, kcal: plan.estKcal, completedAt: new Date() };
+  // Archive the plan so a new one can be generated explicitly.
+  await updateDoc(doc(db, "workout_plans", plan.id), { archived: true, completedAt: Timestamp.now() }).catch(() => {});
+  // Denormalize for leaderboards + feed.
+  await Promise.all([
+    bumpStat(uid, "totalWorkouts", 1).catch(() => {}),
+    bumpStat(uid, "caloriesBurned", plan.estKcal || 0).catch(() => {}),
+    postActivity(uid, "workout_completed", { title: plan.title, kcal: plan.estKcal, durationMin: plan.durationMin }).catch(() => {}),
+  ]);
+  return { id: ref.id, uid, title: plan.title, durationMin: plan.durationMin, kcal: plan.estKcal, exercises: plan.exercises, completedAt: new Date() };
 }
 
 export async function listWorkoutHistory(uid: string, max = 50): Promise<WorkoutLog[]> {
@@ -98,13 +115,14 @@ export async function listWorkoutHistory(uid: string, max = 50): Promise<Workout
   );
   const snap = await getDocs(q);
   return snap.docs.map((d) => {
-    const data = d.data() as { uid: string; title: string; durationMin: number; kcal: number; completedAt: Timestamp };
+    const data = d.data() as { uid: string; title: string; durationMin: number; kcal: number; exercises?: Exercise[]; completedAt: Timestamp };
     return {
       id: d.id,
       uid: data.uid,
       title: data.title,
       durationMin: data.durationMin,
       kcal: data.kcal,
+      exercises: data.exercises ?? [],
       completedAt: data.completedAt.toDate(),
     };
   });
