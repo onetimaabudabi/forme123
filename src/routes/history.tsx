@@ -63,6 +63,11 @@ function History() {
                   <div className="flex-1">
                     <p className="font-semibold text-sm">{w.title}</p>
                     <p className="text-xs text-foreground/50">{w.completedAt.toLocaleDateString()} · {w.durationMin} min · {w.kcal} kcal</p>
+                    {w.exercises && w.exercises.length > 0 && (
+                      <p className="text-[11px] text-foreground/40 mt-1 truncate">
+                        {w.exercises.length} exercises · {w.exercises.map((e) => `${e.name} ${e.sets}×${e.reps}`).join(" · ")}
+                      </p>
+                    )}
                   </div>
                   <button onClick={() => remove(w.id)} className="size-9 rounded-full bg-secondary flex items-center justify-center text-foreground/60"><Trash2 className="size-4" /></button>
                 </div>
