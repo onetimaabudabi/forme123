@@ -29,6 +29,7 @@ import { Route as ActivityRouteImport } from './routes/activity'
 import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as TabsRouteImport } from './routes/_tabs'
 import { Route as TabsIndexRouteImport } from './routes/_tabs.index'
+import { Route as UUidRouteImport } from './routes/u.$uid'
 import { Route as TabsWorkoutRouteImport } from './routes/_tabs.workout'
 import { Route as TabsProgressRouteImport } from './routes/_tabs.progress'
 import { Route as TabsProfileRouteImport } from './routes/_tabs.profile'
@@ -133,6 +134,11 @@ const TabsIndexRoute = TabsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => TabsRoute,
 } as any)
+const UUidRoute = UUidRouteImport.update({
+  id: '/u/$uid',
+  path: '/u/$uid',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TabsWorkoutRoute = TabsWorkoutRouteImport.update({
   id: '/workout',
   path: '/workout',
@@ -178,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof TabsProfileRoute
   '/progress': typeof TabsProgressRoute
   '/workout': typeof TabsWorkoutRoute
+  '/u/$uid': typeof UUidRoute
 }
 export interface FileRoutesByTo {
   '/achievements': typeof AchievementsRoute
@@ -202,6 +209,7 @@ export interface FileRoutesByTo {
   '/profile': typeof TabsProfileRoute
   '/progress': typeof TabsProgressRoute
   '/workout': typeof TabsWorkoutRoute
+  '/u/$uid': typeof UUidRoute
   '/': typeof TabsIndexRoute
 }
 export interface FileRoutesById {
@@ -229,6 +237,7 @@ export interface FileRoutesById {
   '/_tabs/profile': typeof TabsProfileRoute
   '/_tabs/progress': typeof TabsProgressRoute
   '/_tabs/workout': typeof TabsWorkoutRoute
+  '/u/$uid': typeof UUidRoute
   '/_tabs/': typeof TabsIndexRoute
 }
 export interface FileRouteTypes {
@@ -257,6 +266,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/workout'
+    | '/u/$uid'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/achievements'
@@ -281,6 +291,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/workout'
+    | '/u/$uid'
     | '/'
   id:
     | '__root__'
@@ -307,6 +318,7 @@ export interface FileRouteTypes {
     | '/_tabs/profile'
     | '/_tabs/progress'
     | '/_tabs/workout'
+    | '/u/$uid'
     | '/_tabs/'
   fileRoutesById: FileRoutesById
 }
@@ -330,6 +342,7 @@ export interface RootRouteChildren {
   SleepRoute: typeof SleepRoute
   StreakRoute: typeof StreakRoute
   SubscriptionRoute: typeof SubscriptionRoute
+  UUidRoute: typeof UUidRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -474,6 +487,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TabsIndexRouteImport
       parentRoute: typeof TabsRoute
     }
+    '/u/$uid': {
+      id: '/u/$uid'
+      path: '/u/$uid'
+      fullPath: '/u/$uid'
+      preLoaderRoute: typeof UUidRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_tabs/workout': {
       id: '/_tabs/workout'
       path: '/workout'
@@ -543,6 +563,7 @@ const rootRouteChildren: RootRouteChildren = {
   SleepRoute: SleepRoute,
   StreakRoute: StreakRoute,
   SubscriptionRoute: SubscriptionRoute,
+  UUidRoute: UUidRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
