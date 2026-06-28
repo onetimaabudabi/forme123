@@ -1,4 +1,4 @@
-import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, limit, orderBy, query } from "firebase/firestore";
 import { getDb } from "./firebase";
 import type { PublicUser } from "./usernames";
 import type { UserStats } from "./social";
@@ -36,12 +36,7 @@ export async function getGlobalLeaderboard(metric: LeaderboardMetric, max = 50):
 export async function getFriendsLeaderboard(metric: LeaderboardMetric, uids: string[]): Promise<LeaderboardEntry[]> {
   if (uids.length === 0) return [];
   const db = getDb();
-  // Firestore can't query in + orderBy easily; fetch each then sort.
   const all = await Promise.all(uids.map(async (uid) => {
-    const snap = await getDocs(query(collection(db, "users"), orderBy("username"), limit(1))); // dummy
-    void snap; // unused
-    // Direct doc fetch:
-    const { doc, getDoc } = await import("firebase/firestore");
     const d = await getDoc(doc(db, "users", uid));
     if (!d.exists()) return null;
     const data = d.data() as Record<string, unknown> & { stats?: Partial<UserStats> };
