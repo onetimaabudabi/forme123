@@ -3,6 +3,8 @@ import { getDb } from "./firebase";
 import type { FitnessGoal } from "./auth";
 import { applyDailyCompletion, undoDailyCompletion } from "./streak";
 import { evaluateAchievements, unlockAchievement, countWorkouts } from "./achievements";
+import { bumpStat, postActivity, setStat } from "./social";
+import { doc, getDoc } from "firebase/firestore";
 
 export type Mission = {
   id: string;
@@ -58,6 +60,17 @@ export async function toggleMission(uid: string, id: string, completed: boolean)
     await unlockAchievement(uid, "first_mission");
     const workoutCount = await countWorkouts(uid).catch(() => 0);
     await evaluateAchievements(uid, { streak, workoutCount });
+    // Denormalize for leaderboards + feed.
+    await bumpStat(uid, "totalMissions", 1).catch(() => {});
+    await setStat(uid, "currentStreak", streak).catch(() => {});
+    // Update longestStreak if needed.
+    try {
+      const snap = await getDoc(doc(getDb(), "users", uid));
+      const longest = (snap.data() as { stats?: { longestStreak?: number } })?.stats?.longestStreak ?? 0;
+      if (streak > longest) await setStat(uid, "longestStreak", streak);
+    } catch { /* ignore */ }
+    postActivity(uid, "mission_completed", { streak }).catch(() => {});
+    if (streak > 0 && streak % 7 === 0) postActivity(uid, "streak_milestone", { streak }).catch(() => {});
     return streak;
   }
   return undoDailyCompletion(uid);
