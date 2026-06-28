@@ -15,6 +15,16 @@ export type UserProfile = {
   weight: number;
   goal: FitnessGoal;
   streak: number;
+  username?: string;
+  friendCode?: string;
+  stats?: {
+    totalWorkouts?: number;
+    currentStreak?: number;
+    longestStreak?: number;
+    activeDays?: number;
+    totalMissions?: number;
+    caloriesBurned?: number;
+  };
   createdAt?: unknown;
 };
 
