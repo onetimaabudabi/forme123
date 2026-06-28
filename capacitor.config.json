@@ -1,0 +1,6 @@
+{
+  "appId": "com.forme.app",
+  "appName": "Forme",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}
