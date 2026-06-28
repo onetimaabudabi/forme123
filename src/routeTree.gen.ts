@@ -24,6 +24,7 @@ import { Route as HistoryRouteImport } from './routes/history'
 import { Route as FriendsRouteImport } from './routes/friends'
 import { Route as EditProfileRouteImport } from './routes/edit-profile'
 import { Route as ChallengesRouteImport } from './routes/challenges'
+import { Route as AddFriendRouteImport } from './routes/add-friend'
 import { Route as ActivityRouteImport } from './routes/activity'
 import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as TabsRouteImport } from './routes/_tabs'
@@ -108,6 +109,11 @@ const ChallengesRoute = ChallengesRouteImport.update({
   path: '/challenges',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AddFriendRoute = AddFriendRouteImport.update({
+  id: '/add-friend',
+  path: '/add-friend',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ActivityRoute = ActivityRouteImport.update({
   id: '/activity',
   path: '/activity',
@@ -152,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/': typeof TabsIndexRoute
   '/achievements': typeof AchievementsRoute
   '/activity': typeof ActivityRoute
+  '/add-friend': typeof AddFriendRoute
   '/challenges': typeof ChallengesRoute
   '/edit-profile': typeof EditProfileRoute
   '/friends': typeof FriendsRoute
@@ -175,6 +182,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/achievements': typeof AchievementsRoute
   '/activity': typeof ActivityRoute
+  '/add-friend': typeof AddFriendRoute
   '/challenges': typeof ChallengesRoute
   '/edit-profile': typeof EditProfileRoute
   '/friends': typeof FriendsRoute
@@ -201,6 +209,7 @@ export interface FileRoutesById {
   '/_tabs': typeof TabsRouteWithChildren
   '/achievements': typeof AchievementsRoute
   '/activity': typeof ActivityRoute
+  '/add-friend': typeof AddFriendRoute
   '/challenges': typeof ChallengesRoute
   '/edit-profile': typeof EditProfileRoute
   '/friends': typeof FriendsRoute
@@ -228,6 +237,7 @@ export interface FileRouteTypes {
     | '/'
     | '/achievements'
     | '/activity'
+    | '/add-friend'
     | '/challenges'
     | '/edit-profile'
     | '/friends'
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
   to:
     | '/achievements'
     | '/activity'
+    | '/add-friend'
     | '/challenges'
     | '/edit-profile'
     | '/friends'
@@ -276,6 +287,7 @@ export interface FileRouteTypes {
     | '/_tabs'
     | '/achievements'
     | '/activity'
+    | '/add-friend'
     | '/challenges'
     | '/edit-profile'
     | '/friends'
@@ -302,6 +314,7 @@ export interface RootRouteChildren {
   TabsRoute: typeof TabsRouteWithChildren
   AchievementsRoute: typeof AchievementsRoute
   ActivityRoute: typeof ActivityRoute
+  AddFriendRoute: typeof AddFriendRoute
   ChallengesRoute: typeof ChallengesRoute
   EditProfileRoute: typeof EditProfileRoute
   FriendsRoute: typeof FriendsRoute
@@ -426,6 +439,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChallengesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/add-friend': {
+      id: '/add-friend'
+      path: '/add-friend'
+      fullPath: '/add-friend'
+      preLoaderRoute: typeof AddFriendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/activity': {
       id: '/activity'
       path: '/activity'
@@ -507,6 +527,7 @@ const rootRouteChildren: RootRouteChildren = {
   TabsRoute: TabsRouteWithChildren,
   AchievementsRoute: AchievementsRoute,
   ActivityRoute: ActivityRoute,
+  AddFriendRoute: AddFriendRoute,
   ChallengesRoute: ChallengesRoute,
   EditProfileRoute: EditProfileRoute,
   FriendsRoute: FriendsRoute,
