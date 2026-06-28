@@ -17,6 +17,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ProfileSetupRouteImport } from './routes/profile-setup'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as NutritionRouteImport } from './routes/nutrition'
+import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as MeasurementsRouteImport } from './routes/measurements'
 import { Route as MealPlanRouteImport } from './routes/meal-plan'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
@@ -73,6 +74,11 @@ const OnboardingRoute = OnboardingRouteImport.update({
 const NutritionRoute = NutritionRouteImport.update({
   id: '/nutrition',
   path: '/nutrition',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MeasurementsRoute = MeasurementsRouteImport.update({
@@ -172,6 +178,7 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof LeaderboardRoute
   '/meal-plan': typeof MealPlanRoute
   '/measurements': typeof MeasurementsRoute
+  '/notifications': typeof NotificationsRoute
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
   '/profile-setup': typeof ProfileSetupRoute
@@ -197,6 +204,7 @@ export interface FileRoutesByTo {
   '/leaderboard': typeof LeaderboardRoute
   '/meal-plan': typeof MealPlanRoute
   '/measurements': typeof MeasurementsRoute
+  '/notifications': typeof NotificationsRoute
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
   '/profile-setup': typeof ProfileSetupRoute
@@ -225,6 +233,7 @@ export interface FileRoutesById {
   '/leaderboard': typeof LeaderboardRoute
   '/meal-plan': typeof MealPlanRoute
   '/measurements': typeof MeasurementsRoute
+  '/notifications': typeof NotificationsRoute
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
   '/profile-setup': typeof ProfileSetupRoute
@@ -254,6 +263,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/meal-plan'
     | '/measurements'
+    | '/notifications'
     | '/nutrition'
     | '/onboarding'
     | '/profile-setup'
@@ -279,6 +289,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/meal-plan'
     | '/measurements'
+    | '/notifications'
     | '/nutrition'
     | '/onboarding'
     | '/profile-setup'
@@ -306,6 +317,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/meal-plan'
     | '/measurements'
+    | '/notifications'
     | '/nutrition'
     | '/onboarding'
     | '/profile-setup'
@@ -334,6 +346,7 @@ export interface RootRouteChildren {
   LeaderboardRoute: typeof LeaderboardRoute
   MealPlanRoute: typeof MealPlanRoute
   MeasurementsRoute: typeof MeasurementsRoute
+  NotificationsRoute: typeof NotificationsRoute
   NutritionRoute: typeof NutritionRoute
   OnboardingRoute: typeof OnboardingRoute
   ProfileSetupRoute: typeof ProfileSetupRoute
@@ -401,6 +414,13 @@ declare module '@tanstack/react-router' {
       path: '/nutrition'
       fullPath: '/nutrition'
       preLoaderRoute: typeof NutritionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/measurements': {
@@ -555,6 +575,7 @@ const rootRouteChildren: RootRouteChildren = {
   LeaderboardRoute: LeaderboardRoute,
   MealPlanRoute: MealPlanRoute,
   MeasurementsRoute: MeasurementsRoute,
+  NotificationsRoute: NotificationsRoute,
   NutritionRoute: NutritionRoute,
   OnboardingRoute: OnboardingRoute,
   ProfileSetupRoute: ProfileSetupRoute,
