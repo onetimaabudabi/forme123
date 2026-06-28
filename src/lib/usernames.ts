@@ -8,7 +8,7 @@ export type PublicUser = {
   name?: string;
   goal?: string;
   streak?: number;
-  stats?: { totalWorkouts?: number; currentStreak?: number; longestStreak?: number; activeDays?: number; totalMissions?: number };
+  stats?: { totalWorkouts?: number; currentStreak?: number; longestStreak?: number; activeDays?: number; totalMissions?: number; caloriesBurned?: number };
 };
 
 const ALPHA = "abcdefghijklmnopqrstuvwxyz0123456789";
