@@ -34,6 +34,7 @@ import { Route as UUidRouteImport } from './routes/u.$uid'
 import { Route as TabsWorkoutRouteImport } from './routes/_tabs.workout'
 import { Route as TabsProgressRouteImport } from './routes/_tabs.progress'
 import { Route as TabsProfileRouteImport } from './routes/_tabs.profile'
+import { Route as TabsFeedRouteImport } from './routes/_tabs.feed'
 import { Route as TabsCoachRouteImport } from './routes/_tabs.coach'
 
 const SubscriptionRoute = SubscriptionRouteImport.update({
@@ -160,6 +161,11 @@ const TabsProfileRoute = TabsProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => TabsRoute,
 } as any)
+const TabsFeedRoute = TabsFeedRouteImport.update({
+  id: '/feed',
+  path: '/feed',
+  getParentRoute: () => TabsRoute,
+} as any)
 const TabsCoachRoute = TabsCoachRouteImport.update({
   id: '/coach',
   path: '/coach',
@@ -188,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/streak': typeof StreakRoute
   '/subscription': typeof SubscriptionRoute
   '/coach': typeof TabsCoachRoute
+  '/feed': typeof TabsFeedRoute
   '/profile': typeof TabsProfileRoute
   '/progress': typeof TabsProgressRoute
   '/workout': typeof TabsWorkoutRoute
@@ -214,6 +221,7 @@ export interface FileRoutesByTo {
   '/streak': typeof StreakRoute
   '/subscription': typeof SubscriptionRoute
   '/coach': typeof TabsCoachRoute
+  '/feed': typeof TabsFeedRoute
   '/profile': typeof TabsProfileRoute
   '/progress': typeof TabsProgressRoute
   '/workout': typeof TabsWorkoutRoute
@@ -243,6 +251,7 @@ export interface FileRoutesById {
   '/streak': typeof StreakRoute
   '/subscription': typeof SubscriptionRoute
   '/_tabs/coach': typeof TabsCoachRoute
+  '/_tabs/feed': typeof TabsFeedRoute
   '/_tabs/profile': typeof TabsProfileRoute
   '/_tabs/progress': typeof TabsProgressRoute
   '/_tabs/workout': typeof TabsWorkoutRoute
@@ -273,6 +282,7 @@ export interface FileRouteTypes {
     | '/streak'
     | '/subscription'
     | '/coach'
+    | '/feed'
     | '/profile'
     | '/progress'
     | '/workout'
@@ -299,6 +309,7 @@ export interface FileRouteTypes {
     | '/streak'
     | '/subscription'
     | '/coach'
+    | '/feed'
     | '/profile'
     | '/progress'
     | '/workout'
@@ -327,6 +338,7 @@ export interface FileRouteTypes {
     | '/streak'
     | '/subscription'
     | '/_tabs/coach'
+    | '/_tabs/feed'
     | '/_tabs/profile'
     | '/_tabs/progress'
     | '/_tabs/workout'
@@ -535,6 +547,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TabsProfileRouteImport
       parentRoute: typeof TabsRoute
     }
+    '/_tabs/feed': {
+      id: '/_tabs/feed'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof TabsFeedRouteImport
+      parentRoute: typeof TabsRoute
+    }
     '/_tabs/coach': {
       id: '/_tabs/coach'
       path: '/coach'
@@ -547,6 +566,7 @@ declare module '@tanstack/react-router' {
 
 interface TabsRouteChildren {
   TabsCoachRoute: typeof TabsCoachRoute
+  TabsFeedRoute: typeof TabsFeedRoute
   TabsProfileRoute: typeof TabsProfileRoute
   TabsProgressRoute: typeof TabsProgressRoute
   TabsWorkoutRoute: typeof TabsWorkoutRoute
@@ -555,6 +575,7 @@ interface TabsRouteChildren {
 
 const TabsRouteChildren: TabsRouteChildren = {
   TabsCoachRoute: TabsCoachRoute,
+  TabsFeedRoute: TabsFeedRoute,
   TabsProfileRoute: TabsProfileRoute,
   TabsProgressRoute: TabsProgressRoute,
   TabsWorkoutRoute: TabsWorkoutRoute,
