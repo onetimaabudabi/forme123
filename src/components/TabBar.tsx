@@ -1,12 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Dumbbell, Sparkles, BarChart3, User } from "lucide-react";
+import { Home, Dumbbell, Sparkles, User, Rss } from "lucide-react";
 
 type Tab = { to: string; label: string; icon: typeof Home; exact?: boolean };
 const tabs: Tab[] = [
+  { to: "/feed", label: "Feed", icon: Rss },
   { to: "/", label: "Home", icon: Home, exact: true },
   { to: "/workout", label: "Workout", icon: Dumbbell },
-  { to: "/coach", label: "AI Coach", icon: Sparkles },
-  { to: "/progress", label: "Progress", icon: BarChart3 },
+  { to: "/coach", label: "Coach", icon: Sparkles },
   { to: "/profile", label: "Profile", icon: User },
 ];
 

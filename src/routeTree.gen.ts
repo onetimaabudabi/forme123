@@ -23,7 +23,6 @@ import { Route as MealPlanRouteImport } from './routes/meal-plan'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as FriendsRouteImport } from './routes/friends'
-import { Route as FeedRouteImport } from './routes/feed'
 import { Route as EditProfileRouteImport } from './routes/edit-profile'
 import { Route as ChallengesRouteImport } from './routes/challenges'
 import { Route as AddFriendRouteImport } from './routes/add-friend'
@@ -107,11 +106,6 @@ const FriendsRoute = FriendsRouteImport.update({
   path: '/friends',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FeedRoute = FeedRouteImport.update({
-  id: '/feed',
-  path: '/feed',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const EditProfileRoute = EditProfileRouteImport.update({
   id: '/edit-profile',
   path: '/edit-profile',
@@ -179,7 +173,6 @@ export interface FileRoutesByFullPath {
   '/add-friend': typeof AddFriendRoute
   '/challenges': typeof ChallengesRoute
   '/edit-profile': typeof EditProfileRoute
-  '/feed': typeof FeedRoute
   '/friends': typeof FriendsRoute
   '/history': typeof HistoryRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -206,7 +199,6 @@ export interface FileRoutesByTo {
   '/add-friend': typeof AddFriendRoute
   '/challenges': typeof ChallengesRoute
   '/edit-profile': typeof EditProfileRoute
-  '/feed': typeof FeedRoute
   '/friends': typeof FriendsRoute
   '/history': typeof HistoryRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -236,7 +228,6 @@ export interface FileRoutesById {
   '/add-friend': typeof AddFriendRoute
   '/challenges': typeof ChallengesRoute
   '/edit-profile': typeof EditProfileRoute
-  '/feed': typeof FeedRoute
   '/friends': typeof FriendsRoute
   '/history': typeof HistoryRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -267,7 +258,6 @@ export interface FileRouteTypes {
     | '/add-friend'
     | '/challenges'
     | '/edit-profile'
-    | '/feed'
     | '/friends'
     | '/history'
     | '/leaderboard'
@@ -294,7 +284,6 @@ export interface FileRouteTypes {
     | '/add-friend'
     | '/challenges'
     | '/edit-profile'
-    | '/feed'
     | '/friends'
     | '/history'
     | '/leaderboard'
@@ -323,7 +312,6 @@ export interface FileRouteTypes {
     | '/add-friend'
     | '/challenges'
     | '/edit-profile'
-    | '/feed'
     | '/friends'
     | '/history'
     | '/leaderboard'
@@ -353,7 +341,6 @@ export interface RootRouteChildren {
   AddFriendRoute: typeof AddFriendRoute
   ChallengesRoute: typeof ChallengesRoute
   EditProfileRoute: typeof EditProfileRoute
-  FeedRoute: typeof FeedRoute
   FriendsRoute: typeof FriendsRoute
   HistoryRoute: typeof HistoryRoute
   LeaderboardRoute: typeof LeaderboardRoute
@@ -471,13 +458,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FriendsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/feed': {
-      id: '/feed'
-      path: '/feed'
-      fullPath: '/feed'
-      preLoaderRoute: typeof FeedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/edit-profile': {
       id: '/edit-profile'
       path: '/edit-profile'
@@ -590,7 +570,6 @@ const rootRouteChildren: RootRouteChildren = {
   AddFriendRoute: AddFriendRoute,
   ChallengesRoute: ChallengesRoute,
   EditProfileRoute: EditProfileRoute,
-  FeedRoute: FeedRoute,
   FriendsRoute: FriendsRoute,
   HistoryRoute: HistoryRoute,
   LeaderboardRoute: LeaderboardRoute,

@@ -24,7 +24,7 @@ function SignIn() {
     try {
       if (mode === "signin") {
         await signIn(email.trim(), password);
-        navigate({ to: "/" });
+        navigate({ to: "/feed" });
       } else {
         await signUp(email.trim(), password);
         navigate({ to: "/profile-setup" });
