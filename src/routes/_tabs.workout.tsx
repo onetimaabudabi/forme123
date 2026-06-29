@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Clock, Flame, Check, Sparkles, Dumbbell } from "lucide-react";
+import { Clock, Flame, Check, Sparkles, Dumbbell, X, Share2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { generateWorkoutPlan, getActivePlan, logCompletedWorkout, type WorkoutPlan } from "@/lib/workouts";
 import { evaluateAchievements, countWorkouts } from "@/lib/achievements";
+import { postActivity } from "@/lib/social";
 
 export const Route = createFileRoute("/_tabs/workout")({
   head: () => ({ meta: [{ title: "Workout — Forme" }] }),
@@ -18,6 +19,10 @@ function Workout() {
   const [done, setDone] = useState<Set<number>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [logged, setLogged] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [completed, setCompleted] = useState<WorkoutPlan | null>(null);
+  const [caption, setCaption] = useState("");
+  const [sharing, setSharing] = useState(false);
 
   useEffect(() => {
     if (!profile) return;
@@ -48,11 +53,33 @@ function Workout() {
     if (!profile || !plan) return;
     try {
       await logCompletedWorkout(profile.uid, plan);
+      setCompleted(plan);
       setLogged(true);
       const count = await countWorkouts(profile.uid);
       await evaluateAchievements(profile.uid, { workoutCount: count, streak: profile.streak });
+      setPlan(null);
+      setShareOpen(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to log workout");
+    }
+  };
+
+  const share = async () => {
+    if (!profile || !completed) return;
+    setSharing(true);
+    try {
+      await postActivity(profile.uid, "workout_completed", {
+        title: completed.title,
+        durationMin: completed.durationMin,
+        kcal: completed.estKcal,
+        exercises: completed.exercises.length,
+        caption: caption.trim() || undefined,
+        completedAt: new Date().toISOString(),
+      });
+    } finally {
+      setSharing(false);
+      setShareOpen(false);
+      setCaption("");
     }
   };
 
@@ -127,6 +154,45 @@ function Workout() {
           {logged && <p className="mt-5 text-center text-sm text-emerald-600 font-semibold">Workout saved ✓</p>}
           {error && <p className="mt-3 text-xs text-destructive">{error}</p>}
         </>
+      )}
+
+      {shareOpen && completed && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center">
+          <div className="absolute inset-0 bg-black/40 animate-in fade-in duration-200" onClick={() => setShareOpen(false)} />
+          <div className="relative w-full max-w-md mx-4 mb-6 rounded-3xl bg-background border shadow-2xl p-6 animate-in slide-in-from-bottom-8 duration-300">
+            <button onClick={() => setShareOpen(false)} className="absolute top-4 right-4 size-8 rounded-full bg-secondary flex items-center justify-center">
+              <X className="size-4" />
+            </button>
+            <div className="size-14 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto">
+              <Share2 className="size-7 text-accent" />
+            </div>
+            <h3 className="mt-4 text-xl font-bold tracking-tight text-center">Workout complete!</h3>
+            <p className="mt-1 text-sm text-foreground/60 text-center">Share with your friends?</p>
+
+            <div className="mt-5 rounded-2xl bg-secondary p-4">
+              <p className="text-sm font-semibold">{completed.title}</p>
+              <p className="text-xs text-foreground/60 mt-0.5">{completed.durationMin} min · {completed.exercises.length} exercises · ~{completed.estKcal} kcal</p>
+            </div>
+
+            <textarea
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
+              placeholder="Add a note (optional)…"
+              maxLength={200}
+              className="mt-3 w-full rounded-2xl bg-secondary px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent/40 resize-none"
+              rows={2}
+            />
+
+            <div className="mt-5 grid grid-cols-2 gap-2">
+              <button onClick={() => setShareOpen(false)} className="h-12 rounded-full bg-secondary font-semibold text-sm active:scale-[0.98] transition">
+                Not now
+              </button>
+              <button onClick={share} disabled={sharing} className="h-12 rounded-full bg-black text-white font-semibold text-sm active:scale-[0.98] transition disabled:opacity-50 flex items-center justify-center gap-2">
+                <Share2 className="size-4" /> {sharing ? "Sharing…" : "Share"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -23,7 +23,6 @@ import { Route as MealPlanRouteImport } from './routes/meal-plan'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as FriendsRouteImport } from './routes/friends'
-import { Route as FeedRouteImport } from './routes/feed'
 import { Route as EditProfileRouteImport } from './routes/edit-profile'
 import { Route as ChallengesRouteImport } from './routes/challenges'
 import { Route as AddFriendRouteImport } from './routes/add-friend'
@@ -35,6 +34,7 @@ import { Route as UUidRouteImport } from './routes/u.$uid'
 import { Route as TabsWorkoutRouteImport } from './routes/_tabs.workout'
 import { Route as TabsProgressRouteImport } from './routes/_tabs.progress'
 import { Route as TabsProfileRouteImport } from './routes/_tabs.profile'
+import { Route as TabsFeedRouteImport } from './routes/_tabs.feed'
 import { Route as TabsCoachRouteImport } from './routes/_tabs.coach'
 
 const SubscriptionRoute = SubscriptionRouteImport.update({
@@ -107,11 +107,6 @@ const FriendsRoute = FriendsRouteImport.update({
   path: '/friends',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FeedRoute = FeedRouteImport.update({
-  id: '/feed',
-  path: '/feed',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const EditProfileRoute = EditProfileRouteImport.update({
   id: '/edit-profile',
   path: '/edit-profile',
@@ -166,6 +161,11 @@ const TabsProfileRoute = TabsProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => TabsRoute,
 } as any)
+const TabsFeedRoute = TabsFeedRouteImport.update({
+  id: '/feed',
+  path: '/feed',
+  getParentRoute: () => TabsRoute,
+} as any)
 const TabsCoachRoute = TabsCoachRouteImport.update({
   id: '/coach',
   path: '/coach',
@@ -179,7 +179,6 @@ export interface FileRoutesByFullPath {
   '/add-friend': typeof AddFriendRoute
   '/challenges': typeof ChallengesRoute
   '/edit-profile': typeof EditProfileRoute
-  '/feed': typeof FeedRoute
   '/friends': typeof FriendsRoute
   '/history': typeof HistoryRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -195,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/streak': typeof StreakRoute
   '/subscription': typeof SubscriptionRoute
   '/coach': typeof TabsCoachRoute
+  '/feed': typeof TabsFeedRoute
   '/profile': typeof TabsProfileRoute
   '/progress': typeof TabsProgressRoute
   '/workout': typeof TabsWorkoutRoute
@@ -206,7 +206,6 @@ export interface FileRoutesByTo {
   '/add-friend': typeof AddFriendRoute
   '/challenges': typeof ChallengesRoute
   '/edit-profile': typeof EditProfileRoute
-  '/feed': typeof FeedRoute
   '/friends': typeof FriendsRoute
   '/history': typeof HistoryRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -222,6 +221,7 @@ export interface FileRoutesByTo {
   '/streak': typeof StreakRoute
   '/subscription': typeof SubscriptionRoute
   '/coach': typeof TabsCoachRoute
+  '/feed': typeof TabsFeedRoute
   '/profile': typeof TabsProfileRoute
   '/progress': typeof TabsProgressRoute
   '/workout': typeof TabsWorkoutRoute
@@ -236,7 +236,6 @@ export interface FileRoutesById {
   '/add-friend': typeof AddFriendRoute
   '/challenges': typeof ChallengesRoute
   '/edit-profile': typeof EditProfileRoute
-  '/feed': typeof FeedRoute
   '/friends': typeof FriendsRoute
   '/history': typeof HistoryRoute
   '/leaderboard': typeof LeaderboardRoute
@@ -252,6 +251,7 @@ export interface FileRoutesById {
   '/streak': typeof StreakRoute
   '/subscription': typeof SubscriptionRoute
   '/_tabs/coach': typeof TabsCoachRoute
+  '/_tabs/feed': typeof TabsFeedRoute
   '/_tabs/profile': typeof TabsProfileRoute
   '/_tabs/progress': typeof TabsProgressRoute
   '/_tabs/workout': typeof TabsWorkoutRoute
@@ -267,7 +267,6 @@ export interface FileRouteTypes {
     | '/add-friend'
     | '/challenges'
     | '/edit-profile'
-    | '/feed'
     | '/friends'
     | '/history'
     | '/leaderboard'
@@ -283,6 +282,7 @@ export interface FileRouteTypes {
     | '/streak'
     | '/subscription'
     | '/coach'
+    | '/feed'
     | '/profile'
     | '/progress'
     | '/workout'
@@ -294,7 +294,6 @@ export interface FileRouteTypes {
     | '/add-friend'
     | '/challenges'
     | '/edit-profile'
-    | '/feed'
     | '/friends'
     | '/history'
     | '/leaderboard'
@@ -310,6 +309,7 @@ export interface FileRouteTypes {
     | '/streak'
     | '/subscription'
     | '/coach'
+    | '/feed'
     | '/profile'
     | '/progress'
     | '/workout'
@@ -323,7 +323,6 @@ export interface FileRouteTypes {
     | '/add-friend'
     | '/challenges'
     | '/edit-profile'
-    | '/feed'
     | '/friends'
     | '/history'
     | '/leaderboard'
@@ -339,6 +338,7 @@ export interface FileRouteTypes {
     | '/streak'
     | '/subscription'
     | '/_tabs/coach'
+    | '/_tabs/feed'
     | '/_tabs/profile'
     | '/_tabs/progress'
     | '/_tabs/workout'
@@ -353,7 +353,6 @@ export interface RootRouteChildren {
   AddFriendRoute: typeof AddFriendRoute
   ChallengesRoute: typeof ChallengesRoute
   EditProfileRoute: typeof EditProfileRoute
-  FeedRoute: typeof FeedRoute
   FriendsRoute: typeof FriendsRoute
   HistoryRoute: typeof HistoryRoute
   LeaderboardRoute: typeof LeaderboardRoute
@@ -471,13 +470,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FriendsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/feed': {
-      id: '/feed'
-      path: '/feed'
-      fullPath: '/feed'
-      preLoaderRoute: typeof FeedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/edit-profile': {
       id: '/edit-profile'
       path: '/edit-profile'
@@ -555,6 +547,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TabsProfileRouteImport
       parentRoute: typeof TabsRoute
     }
+    '/_tabs/feed': {
+      id: '/_tabs/feed'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof TabsFeedRouteImport
+      parentRoute: typeof TabsRoute
+    }
     '/_tabs/coach': {
       id: '/_tabs/coach'
       path: '/coach'
@@ -567,6 +566,7 @@ declare module '@tanstack/react-router' {
 
 interface TabsRouteChildren {
   TabsCoachRoute: typeof TabsCoachRoute
+  TabsFeedRoute: typeof TabsFeedRoute
   TabsProfileRoute: typeof TabsProfileRoute
   TabsProgressRoute: typeof TabsProgressRoute
   TabsWorkoutRoute: typeof TabsWorkoutRoute
@@ -575,6 +575,7 @@ interface TabsRouteChildren {
 
 const TabsRouteChildren: TabsRouteChildren = {
   TabsCoachRoute: TabsCoachRoute,
+  TabsFeedRoute: TabsFeedRoute,
   TabsProfileRoute: TabsProfileRoute,
   TabsProgressRoute: TabsProgressRoute,
   TabsWorkoutRoute: TabsWorkoutRoute,
@@ -590,7 +591,6 @@ const rootRouteChildren: RootRouteChildren = {
   AddFriendRoute: AddFriendRoute,
   ChallengesRoute: ChallengesRoute,
   EditProfileRoute: EditProfileRoute,
-  FeedRoute: FeedRoute,
   FriendsRoute: FriendsRoute,
   HistoryRoute: HistoryRoute,
   LeaderboardRoute: LeaderboardRoute,
@@ -610,13 +610,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

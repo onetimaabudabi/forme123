@@ -58,7 +58,7 @@ function ProfileSetup() {
       });
       // Assign username + friend code once profile exists.
       await ensureUserIdentity(user.uid, name.trim()).catch(() => {});
-      navigate({ to: "/" });
+      navigate({ to: "/feed" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save");
     } finally {

@@ -2,7 +2,8 @@ import { addDoc, collection, deleteDoc, doc, getDocs, limit, orderBy, query, Tim
 import { getDb } from "./firebase";
 import { groqJSON, type GroqMessage } from "./groq";
 import type { UserProfile } from "./auth";
-import { bumpStat, postActivity } from "./social";
+import { bumpStat } from "./social";
+import { applyDailyCompletion } from "./streak";
 
 export type Exercise = { name: string; sets: number; reps: string; rest: string };
 
@@ -96,11 +97,11 @@ export async function logCompletedWorkout(uid: string, plan: WorkoutPlan): Promi
   });
   // Archive the plan so a new one can be generated explicitly.
   await updateDoc(doc(db, "workout_plans", plan.id), { archived: true, completedAt: Timestamp.now() }).catch(() => {});
-  // Denormalize for leaderboards + feed.
+  // Denormalize for leaderboards. Feed post is handled by the UI so the user can choose to share.
   await Promise.all([
     bumpStat(uid, "totalWorkouts", 1).catch(() => {}),
     bumpStat(uid, "caloriesBurned", plan.estKcal || 0).catch(() => {}),
-    postActivity(uid, "workout_completed", { title: plan.title, kcal: plan.estKcal, durationMin: plan.durationMin }).catch(() => {}),
+    applyDailyCompletion(uid).catch(() => {}),
   ]);
   return { id: ref.id, uid, title: plan.title, durationMin: plan.durationMin, kcal: plan.estKcal, exercises: plan.exercises, completedAt: new Date() };
 }
