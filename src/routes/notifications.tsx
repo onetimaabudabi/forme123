@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PhoneFrame } from "@/components/PhoneFrame";
 import { ChevronLeft, Bell, UserPlus, Check, Trophy, Target, Flame } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useFocusRefetch } from "@/hooks/useFocusRefetch";
 import { useAuth } from "@/lib/auth";
 import { listNotifications, markNotificationRead, type Notification, type NotificationType } from "@/lib/social";
 
@@ -39,7 +40,7 @@ function Notifications() {
   const [items, setItems] = useState<Notification[] | null>(null);
 
   const refresh = async () => { if (profile) setItems(await listNotifications(profile.uid)); };
-  useEffect(() => { void refresh(); }, [profile]);
+  useFocusRefetch(() => refresh(), [profile?.uid]);
 
   const open = async (n: Notification) => {
     if (!profile) return;

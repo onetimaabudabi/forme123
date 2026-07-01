@@ -16,7 +16,7 @@ function Challenges() {
 
   useEffect(() => {
     if (!profile) return;
-    getOrCreateTodayMission(profile.uid, profile.goal).then(setMission).catch(() => {});
+    getOrCreateTodayMission(profile.uid, profile.goal, profile).then(setMission).catch(() => {});
   }, [profile]);
 
   const handle = async () => {

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { PhoneFrame } from "@/components/PhoneFrame";
 import { useAuth, saveUserProfile, type FitnessGoal } from "@/lib/auth";
 import { logWeight } from "@/lib/weights";
+import { changeUsername } from "@/lib/usernames";
 
 export const Route = createFileRoute("/edit-profile")({
   head: () => ({ meta: [{ title: "Edit profile — Forme" }] }),
@@ -19,6 +20,7 @@ function EditProfile() {
   const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [age, setAge] = useState("");
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
@@ -33,6 +35,7 @@ function EditProfile() {
   useEffect(() => {
     if (profile) {
       setName(profile.name);
+      setUsername(profile.username ?? "");
       setAge(String(profile.age));
       setHeight(String(profile.height));
       setWeight(String(profile.weight));
@@ -46,6 +49,9 @@ function EditProfile() {
     setBusy(true); setError(null);
     try {
       const newWeight = Number(weight);
+      if (username && username !== profile.username) {
+        await changeUsername(user.uid, username);
+      }
       await saveUserProfile(user.uid, user.email ?? profile.email, {
         name: name.trim(),
         age: Number(age),
@@ -78,6 +84,10 @@ function EditProfile() {
           <div>
             <label className="text-xs font-semibold text-foreground/50 uppercase tracking-wider">Name</label>
             <input value={name} onChange={(e) => setName(e.target.value)} required className={inputCls} />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-foreground/50 uppercase tracking-wider">Username</label>
+            <input value={username} onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))} minLength={3} className={inputCls} placeholder="username" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>

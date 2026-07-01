@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { PhoneFrame } from "@/components/PhoneFrame";
 import { useAuth, saveUserProfile, type FitnessGoal } from "@/lib/auth";
-import { ensureUserIdentity } from "@/lib/usernames";
+import { ensureUserIdentity, isUsernameAvailable, suggestUsername } from "@/lib/usernames";
 
 export const Route = createFileRoute("/profile-setup")({
   head: () => ({ meta: [{ title: "Set up your profile — Forme" }] }),
@@ -19,6 +19,8 @@ function ProfileSetup() {
   const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [usernameErr, setUsernameErr] = useState<string | null>(null);
   const [age, setAge] = useState("");
   const [gender, setGender] = useState<"male" | "female" | "other">("male");
   const [height, setHeight] = useState("");
@@ -34,6 +36,7 @@ function ProfileSetup() {
   useEffect(() => {
     if (profile) {
       setName(profile.name ?? "");
+      setUsername(profile.username ?? "");
       setAge(profile.age ? String(profile.age) : "");
       setGender((profile.gender as "male" | "female" | "other") || "male");
       setHeight(profile.height ? String(profile.height) : "");
@@ -42,12 +45,22 @@ function ProfileSetup() {
     }
   }, [profile]);
 
+  useEffect(() => {
+    if (!username && name) setUsername(suggestUsername(name));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name]);
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
     setBusy(true);
     setError(null);
+    setUsernameErr(null);
     try {
+      const uname = username.trim().toLowerCase().replace(/[^a-z0-9_]/g, "");
+      if (uname.length < 3) { setUsernameErr("Username must be at least 3 letters/numbers"); setBusy(false); return; }
+      const avail = await isUsernameAvailable(uname, user.uid);
+      if (!avail) { setUsernameErr("Username is already taken"); setBusy(false); return; }
       await saveUserProfile(user.uid, user.email ?? "", {
         name: name.trim(),
         age: Number(age),
@@ -56,8 +69,8 @@ function ProfileSetup() {
         weight: Number(weight),
         goal,
       });
-      // Assign username + friend code once profile exists.
-      await ensureUserIdentity(user.uid, name.trim()).catch(() => {});
+      // Reserve chosen username + friend code once profile exists.
+      await ensureUserIdentity(user.uid, uname).catch(() => {});
       navigate({ to: "/feed" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save");
@@ -75,6 +88,10 @@ function ProfileSetup() {
         <div className="mt-8 space-y-4">
           <Field label="Name">
             <input value={name} onChange={(e) => setName(e.target.value)} required className={inputCls} placeholder="Alex Morgan" />
+          </Field>
+          <Field label="Username">
+            <input value={username} onChange={(e) => { setUsername(e.target.value); setUsernameErr(null); }} required minLength={3} className={inputCls} placeholder="alexm" />
+            {usernameErr && <p className="mt-1 text-xs text-destructive">{usernameErr}</p>}
           </Field>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Age">

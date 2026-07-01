@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PhoneFrame } from "@/components/PhoneFrame";
 import { ChevronLeft, Users, UserPlus, Check, X, Trash2, Flame } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useFocusRefetch } from "@/hooks/useFocusRefetch";
 import { useAuth } from "@/lib/auth";
 import { acceptFriendRequest, declineFriendRequest, listFriends, listIncomingRequests, removeFriend, type Friend, type FriendRequest } from "@/lib/friends";
 import { getPublicUser, type PublicUser } from "@/lib/usernames";
@@ -27,7 +28,7 @@ function FriendsScreen() {
     setFriends(f);
     setIncoming(hydrated);
   };
-  useEffect(() => { void refresh(); }, [profile]);
+  useFocusRefetch(() => refresh(), [profile?.uid]);
 
   const accept = async (r: FriendRequest) => {
     if (!profile) return;

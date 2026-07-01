@@ -100,6 +100,35 @@ export async function resolveFriendCode(code: string): Promise<string | null> {
   return snap.exists() ? (snap.data() as { uid: string }).uid : null;
 }
 
+/** Validate that a candidate username is available (or already owned by the same uid). */
+export async function isUsernameAvailable(candidate: string, uid?: string): Promise<boolean> {
+  const u = normalize(candidate);
+  if (!u || u.length < 3) return false;
+  const snap = await getDoc(doc(getDb(), "usernames", u));
+  if (!snap.exists()) return true;
+  return uid ? (snap.data() as { uid: string }).uid === uid : false;
+}
+
+/** Change a user's username. Frees the previous claim; throws if taken. */
+export async function changeUsername(uid: string, next: string): Promise<string> {
+  const db = getDb();
+  const u = normalize(next);
+  if (!u || u.length < 3) throw new Error("Username must be at least 3 letters/numbers");
+  const userRef = doc(db, "users", uid);
+  const current = (await getDoc(userRef)).data() as { username?: string } | undefined;
+  if (current?.username === u) return u;
+  await runTransaction(db, async (tx) => {
+    const claim = await tx.get(doc(db, "usernames", u));
+    if (claim.exists() && (claim.data() as { uid: string }).uid !== uid) throw new Error("Username is already taken");
+    tx.set(doc(db, "usernames", u), { uid });
+    tx.set(userRef, { username: u }, { merge: true });
+    if (current?.username && current.username !== u) {
+      tx.delete(doc(db, "usernames", current.username));
+    }
+  });
+  return u;
+}
+
 function toPublic(uid: string, data: Record<string, unknown>): PublicUser {
   return {
     uid,

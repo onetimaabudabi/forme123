@@ -67,8 +67,13 @@ function Home() {
   useEffect(() => {
     if (!profile) return;
     ensureStreakFresh(profile.uid).catch(() => {});
-    getOrCreateTodayMission(profile.uid, profile.goal).then(setMission).catch(() => {});
+    getOrCreateTodayMission(profile.uid, profile.goal, profile).then(setMission).catch(() => {});
     unlockAchievement(profile.uid, "first_login").catch(() => {});
+    const onFocus = () => {
+      getOrCreateTodayMission(profile.uid, profile.goal, profile).then(setMission).catch(() => {});
+    };
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
   }, [profile]);
 
   const handleToggleMission = async () => {
