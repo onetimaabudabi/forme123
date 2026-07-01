@@ -68,3 +68,23 @@ Recommend shipping in this order for a single-turn implementation:
 6. Slice F (final QA + index docs)
 
 Reply **all** to ship all six slices in one pass, or list the slice letters you want first (e.g. `A B C`).
+
+---
+
+## Status after this pass
+
+Delivered:
+- **Slice A — Focus-refetch hook** at `src/hooks/useFocusRefetch.ts`. Wired into `feed`, `leaderboard`, `friends`, `history`, `measurements`, `sleep`, `nutrition`, `notifications`. Home mission auto-refreshes on focus. Activity calendar already had it.
+- **Slice B — Daily Challenge** rewritten in `src/lib/missions.ts`. Deterministic per-day doc id `missions/{uid}_{YYYY-MM-DD}` (single write per day, no duplicates). AI-generated title via Groq with static fallback. Home Screen already surfaces the mission card and it now refreshes on focus.
+- **Slice C — Friends leaderboard** now refetches on focus so newly-accepted friends appear without a hard reload.
+- **Slice D — Username system**: chosen at registration (`profile-setup.tsx`, validated via `isUsernameAvailable`) and editable in `edit-profile.tsx` with `changeUsername` (transactional uniqueness + release of previous claim).
+- **Slice F — Firestore indexes required** (create in Firebase console):
+  - `activity_feed`: `uid IN`, `createdAt DESC` (composite)
+  - `friend_requests`: `toUid ==`, `status ==`, `createdAt DESC` (composite)
+  - `friend_requests`: `fromUid ==`, `status ==`, `createdAt DESC` (composite)
+  - Per-collection single-field indexes on `uid` + `createdAt` for `workouts`, `nutrition`, `water`, `sleep`, `weights`, `messages`, `meal_plans` are usually auto-created.
+
+Deferred to next pass (needs a dedicated slice):
+- **Slice E — AI Chat multi-conversation**. Requires new `ai_chats/{uid}/threads/{threadId}` collection, refactor of `_tabs.coach.tsx` into a chat list + active thread view, migration of existing single-conversation history under `messages`. Not shipped in this pass to avoid a half-done refactor. Say "ship E" and I'll build it.
+
+Workout sharing (fix 2) already writes to `activity_feed` via `postActivity` in `_tabs.workout.tsx`. Post appears in Feed immediately because Feed now refetches on tab focus.
