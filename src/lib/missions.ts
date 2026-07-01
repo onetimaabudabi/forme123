@@ -1,10 +1,10 @@
-import { addDoc, collection, getDocs, limit, orderBy, query, updateDoc, where, doc, Timestamp } from "firebase/firestore";
+import { doc, setDoc, updateDoc, Timestamp, getDoc } from "firebase/firestore";
 import { getDb } from "./firebase";
-import type { FitnessGoal } from "./auth";
+import type { FitnessGoal, UserProfile } from "./auth";
 import { applyDailyCompletion, undoDailyCompletion } from "./streak";
 import { evaluateAchievements, unlockAchievement, countWorkouts } from "./achievements";
 import { bumpStat, postActivity, setStat } from "./social";
-import { getDoc } from "firebase/firestore";
+import { groqJSON, type GroqMessage } from "./groq";
 
 export type Mission = {
   id: string;
@@ -20,10 +20,11 @@ const MISSIONS_BY_GOAL: Record<FitnessGoal, string[]> = {
   maintain: ["Complete your activity goal", "Stay hydrated", "Track your nutrition"],
 };
 
-function startOfToday() {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  return d;
+function ymd(d = new Date()): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
 
 function pickMissionTitle(goal: FitnessGoal) {
@@ -32,20 +33,41 @@ function pickMissionTitle(goal: FitnessGoal) {
   return opts[dayIdx % opts.length];
 }
 
-export async function getOrCreateTodayMission(uid: string, goal: FitnessGoal): Promise<Mission> {
+async function generateAIChallenge(profile: UserProfile | null, goal: FitnessGoal): Promise<string> {
+  try {
+    const goalLabel: Record<FitnessGoal, string> = {
+      weight_loss: "sustainable fat loss",
+      muscle_gain: "hypertrophy and strength",
+      maintain: "general fitness and consistency",
+    };
+    const sys: GroqMessage = { role: "system", content: "You write ONE short, motivating, achievable daily fitness micro-challenge. Return STRICT JSON only." };
+    const user: GroqMessage = {
+      role: "user",
+      content: `Give exactly one micro-challenge for today (max 8 words, action-oriented, second-person) tailored to: goal ${goalLabel[goal]}${profile ? `, age ${profile.age}, ${profile.gender}, ${profile.weight}kg` : ""}.
+Return JSON: {"title": string}`,
+    };
+    const parsed = await groqJSON<{ title: string }>([sys, user]);
+    const t = parsed.title?.trim();
+    if (t && t.length > 0 && t.length < 120) return t;
+  } catch { /* fall through */ }
+  return pickMissionTitle(goal);
+}
+
+/** Deterministic per-day mission document, ID `${uid}_${YYYY-MM-DD}`. */
+export async function getOrCreateTodayMission(uid: string, goal: FitnessGoal, profile: UserProfile | null = null): Promise<Mission> {
   const db = getDb();
-  const col = collection(db, "missions");
-  const startTs = Timestamp.fromDate(startOfToday());
-  const q = query(col, where("uid", "==", uid), where("createdAt", ">=", startTs), orderBy("createdAt", "desc"), limit(1));
-  const snap = await getDocs(q);
-  if (!snap.empty) {
-    const d = snap.docs[0];
-    const data = d.data() as { uid: string; title: string; completed: boolean; createdAt: Timestamp };
-    return { id: d.id, uid: data.uid, title: data.title, completed: !!data.completed, createdAt: data.createdAt.toDate() };
+  const date = ymd();
+  const id = `${uid}_${date}`;
+  const ref = doc(db, "missions", id);
+  const snap = await getDoc(ref);
+  if (snap.exists()) {
+    const data = snap.data() as { uid: string; title: string; completed: boolean; createdAt: Timestamp };
+    return { id, uid: data.uid, title: data.title, completed: !!data.completed, createdAt: data.createdAt?.toDate?.() ?? new Date() };
   }
-  const title = pickMissionTitle(goal);
-  const created = await addDoc(col, { uid, title, completed: false, createdAt: Timestamp.now() });
-  return { id: created.id, uid, title, completed: false, createdAt: new Date() };
+  const title = await generateAIChallenge(profile, goal);
+  const now = Timestamp.now();
+  await setDoc(ref, { uid, title, completed: false, date, createdAt: now });
+  return { id, uid, title, completed: false, createdAt: now.toDate() };
 }
 
 export async function setMissionCompleted(id: string, completed: boolean) {
