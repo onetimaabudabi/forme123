@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PhoneFrame } from "@/components/PhoneFrame";
 import { ChevronLeft, Plus, Ruler, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useFocusRefetch } from "@/hooks/useFocusRefetch";
 import { useAuth } from "@/lib/auth";
 import { addMeasurement, deleteMeasurement, listMeasurements, type Measurement, type MeasurementKey } from "@/lib/measurements";
 import { unlockAchievement } from "@/lib/achievements";
@@ -30,7 +31,7 @@ function Measurements() {
     if (!profile) return;
     setItems(await listMeasurements(profile.uid));
   };
-  useEffect(() => { void refresh(); }, [profile]);
+  useFocusRefetch(() => refresh(), [profile?.uid]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PhoneFrame } from "@/components/PhoneFrame";
 import { ChevronLeft, Dumbbell, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useFocusRefetch } from "@/hooks/useFocusRefetch";
 import { useAuth } from "@/lib/auth";
 import { deleteWorkout, listWorkoutHistory, type WorkoutLog } from "@/lib/workouts";
 
@@ -18,7 +19,7 @@ function History() {
     if (!profile) return;
     setItems(await listWorkoutHistory(profile.uid, 100));
   };
-  useEffect(() => { void refresh(); }, [profile]);
+  useFocusRefetch(() => refresh(), [profile?.uid]);
 
   const remove = async (id: string) => { await deleteWorkout(id); await refresh(); };
 
