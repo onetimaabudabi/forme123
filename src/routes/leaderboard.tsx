@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PhoneFrame } from "@/components/PhoneFrame";
 import { ChevronLeft, Crown } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useFocusRefetch } from "@/hooks/useFocusRefetch";
 import { useAuth } from "@/lib/auth";
 import { getFriendsLeaderboard, getGlobalLeaderboard, type LeaderboardEntry, type LeaderboardMetric } from "@/lib/leaderboards";
 import { listFriendUids } from "@/lib/friends";
@@ -25,19 +26,16 @@ function Leaderboard() {
   const [metric, setMetric] = useState<LeaderboardMetric>("currentStreak");
   const [items, setItems] = useState<LeaderboardEntry[] | null>(null);
 
-  useEffect(() => {
+  useFocusRefetch(async () => {
     if (!profile) return;
-    setItems(null);
-    (async () => {
-      if (scope === "global") {
-        setItems(await getGlobalLeaderboard(metric, 50).catch(() => []));
-      } else {
-        const friends = await listFriendUids(profile.uid).catch(() => []);
-        const uids = Array.from(new Set([profile.uid, ...friends]));
-        setItems(await getFriendsLeaderboard(metric, uids).catch(() => []));
-      }
-    })();
-  }, [profile, scope, metric]);
+    if (scope === "global") {
+      setItems(await getGlobalLeaderboard(metric, 50).catch(() => []));
+    } else {
+      const friends = await listFriendUids(profile.uid).catch(() => []);
+      const uids = Array.from(new Set([profile.uid, ...friends]));
+      setItems(await getFriendsLeaderboard(metric, uids).catch(() => []));
+    }
+  }, [profile?.uid, scope, metric]);
 
   if (!profile) return null;
 
