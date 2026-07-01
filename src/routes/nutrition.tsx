@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PhoneFrame } from "@/components/PhoneFrame";
 import { ChevronLeft, Plus, Apple, Trash2, Droplets } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useFocusRefetch } from "@/hooks/useFocusRefetch";
 import { useAuth } from "@/lib/auth";
 import { addNutrition, addWater, deleteNutrition, listTodayNutrition, listTodayWater, type NutritionEntry } from "@/lib/nutrition";
 
@@ -39,7 +40,7 @@ function Nutrition() {
     setItems(n);
     setWaterMl(w.reduce((a, b) => a + b.ml, 0));
   };
-  useEffect(() => { void refresh(); }, [profile]);
+  useFocusRefetch(() => refresh(), [profile?.uid]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PhoneFrame } from "@/components/PhoneFrame";
 import { ChevronLeft, Moon, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useFocusRefetch } from "@/hooks/useFocusRefetch";
 import { useAuth } from "@/lib/auth";
 import { deleteSleep, listSleep, logSleep, type SleepEntry } from "@/lib/sleep";
 
@@ -28,7 +29,7 @@ function Sleep() {
     if (!profile) return;
     setItems(await listSleep(profile.uid));
   };
-  useEffect(() => { void refresh(); }, [profile]);
+  useFocusRefetch(() => refresh(), [profile?.uid]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
