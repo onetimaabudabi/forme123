@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Dumbbell, Target, Flame, Trophy, Scale, Ruler, Rss, UserPlus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useFocusRefetch } from "@/hooks/useFocusRefetch";
 import { useAuth } from "@/lib/auth";
 import { getFriendsFeed, type FeedItem, type FeedItemType } from "@/lib/social";
 import { listFriendUids } from "@/lib/friends";
@@ -49,22 +50,16 @@ function Feed() {
   const [items, setItems] = useState<FeedItem[] | null>(null);
   const [users, setUsers] = useState<Record<string, PublicUser | null>>({});
 
-  useEffect(() => {
+  useFocusRefetch(async () => {
     if (!profile) return;
-    let cancelled = false;
-    (async () => {
-      const friends = await listFriendUids(profile.uid).catch(() => []);
-      const uids = Array.from(new Set([profile.uid, ...friends]));
-      const feed = await getFriendsFeed(uids, 50).catch(() => []);
-      if (cancelled) return;
-      setItems(feed);
-      const need = Array.from(new Set(feed.map((i) => i.uid)));
-      const hydrated = await Promise.all(need.map(async (uid) => [uid, await getPublicUser(uid).catch(() => null)] as const));
-      if (cancelled) return;
-      setUsers(Object.fromEntries(hydrated));
-    })();
-    return () => { cancelled = true; };
-  }, [profile]);
+    const friends = await listFriendUids(profile.uid).catch(() => []);
+    const uids = Array.from(new Set([profile.uid, ...friends]));
+    const feed = await getFriendsFeed(uids, 50).catch(() => []);
+    setItems(feed);
+    const need = Array.from(new Set(feed.map((i) => i.uid)));
+    const hydrated = await Promise.all(need.map(async (uid) => [uid, await getPublicUser(uid).catch(() => null)] as const));
+    setUsers(Object.fromEntries(hydrated));
+  }, [profile?.uid]);
 
   if (!profile) return null;
 
