@@ -1,6 +1,7 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getAuth, type Auth, browserLocalPersistence, setPersistence } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
+import { getStorage, type FirebaseStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC1lFnZ-jACQe2VqHJZHX47mSfN25zk5A8",
@@ -15,18 +16,21 @@ const firebaseConfig = {
 let _app: FirebaseApp | null = null;
 let _auth: Auth | null = null;
 let _db: Firestore | null = null;
+let _storage: FirebaseStorage | null = null;
 
 export function getFirebase() {
   if (!_app) {
     _app = getApps().length ? getApp() : initializeApp(firebaseConfig);
     _auth = getAuth(_app);
     _db = getFirestore(_app);
+    _storage = getStorage(_app);
     if (typeof window !== "undefined") {
       setPersistence(_auth, browserLocalPersistence).catch(() => {});
     }
   }
-  return { app: _app!, auth: _auth!, db: _db! };
+  return { app: _app!, auth: _auth!, db: _db!, storage: _storage! };
 }
 
 export const getFbAuth = () => getFirebase().auth;
 export const getDb = () => getFirebase().db;
+export const getBucket = () => getFirebase().storage;
