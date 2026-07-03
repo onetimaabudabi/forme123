@@ -207,7 +207,7 @@ function PostCard({ item, user, selfUid, onOpenComments }: {
   };
 
   return (
-    <div className="surface p-4">
+    <div id={`post-${item.id}`} className="surface p-4 transition-shadow">
       <div className="flex gap-3">
         <Link to="/u/$uid" params={{ uid: item.uid }} className="size-10 rounded-full bg-secondary flex items-center justify-center text-sm font-semibold shrink-0">
           {(user?.name ?? user?.username ?? "?").charAt(0).toUpperCase()}
