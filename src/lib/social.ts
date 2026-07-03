@@ -1,6 +1,6 @@
 import { addDoc, collection, doc, getDocs, limit, onSnapshot, orderBy, query, Timestamp, updateDoc, where, increment, setDoc, getDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
-import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-import { getBucket, getDb } from "./firebase";
+import { getDb } from "./firebase";
+import { getPublicUser } from "./usernames";
 
 export type FeedItemType =
   | "workout_completed"
@@ -62,21 +62,62 @@ export function subscribeFeed(uids: string[], onItems: (items: FeedItem[]) => vo
 export type MediaKind = "image" | "video";
 export type PostMedia = { kind: MediaKind; url: string };
 
-async function uploadOne(uid: string, file: File): Promise<PostMedia> {
+// ---------- Cloudinary upload ----------
+
+function uploadToCloudinary(
+  file: File,
+  onProgress?: (pct: number) => void,
+): Promise<PostMedia> {
+  const cloud = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME as string | undefined;
+  const preset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET as string | undefined;
+  if (!cloud || !preset) {
+    return Promise.reject(new Error("Cloudinary is not configured"));
+  }
   const kind: MediaKind = file.type.startsWith("video") ? "video" : "image";
-  const safeName = file.name.replace(/[^\w.\-]+/g, "_");
-  const path = `posts/${uid}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}_${safeName}`;
-  const r = storageRef(getBucket(), path);
-  await uploadBytes(r, file, { contentType: file.type || undefined });
-  const url = await getDownloadURL(r);
-  return { kind, url };
+  const url = `https://api.cloudinary.com/v1_1/${cloud}/${kind === "video" ? "video" : "image"}/upload`;
+  const form = new FormData();
+  form.append("file", file);
+  form.append("upload_preset", preset);
+
+  return new Promise<PostMedia>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", url);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
+    };
+    xhr.onerror = () => reject(new Error("Upload failed"));
+    xhr.onload = () => {
+      try {
+        const res = JSON.parse(xhr.responseText) as { secure_url?: string; error?: { message?: string } };
+        if (xhr.status >= 200 && xhr.status < 300 && res.secure_url) {
+          resolve({ kind, url: res.secure_url });
+        } else {
+          reject(new Error(res.error?.message || `Upload failed (${xhr.status})`));
+        }
+      } catch {
+        reject(new Error("Invalid upload response"));
+      }
+    };
+    xhr.send(form);
+  });
 }
 
-export async function createPost(uid: string, text: string, files: File[] = []): Promise<string> {
+export async function createPost(
+  uid: string,
+  text: string,
+  files: File[] = [],
+  onProgress?: (pct: number) => void,
+): Promise<string> {
   const photos: string[] = [];
   let video: string | null = null;
-  for (const f of files) {
-    const m = await uploadOne(uid, f);
+  const total = files.length;
+  for (let i = 0; i < files.length; i++) {
+    const f = files[i];
+    const m = await uploadToCloudinary(f, (pct) => {
+      if (!onProgress) return;
+      const overall = Math.round(((i + pct / 100) / Math.max(total, 1)) * 100);
+      onProgress(overall);
+    });
     if (m.kind === "video" && !video) video = m.url;
     else if (m.kind === "image") photos.push(m.url);
   }
@@ -88,6 +129,13 @@ export async function createPost(uid: string, text: string, files: File[] = []):
     createdAt: Timestamp.now(), likesCount: 0, commentsCount: 0,
   });
   return ref.id;
+}
+
+function postPreview(item: { type: FeedItemType; payload: Record<string, unknown> }): { text?: string; photo?: string } {
+  const p = item.payload ?? {};
+  const text = ((p.text as string | undefined) ?? (p.caption as string | undefined) ?? "").slice(0, 80);
+  const photos = p.photos as string[] | undefined;
+  return { text: text || undefined, photo: photos?.[0] };
 }
 
 // ---------- Likes ----------
@@ -104,6 +152,25 @@ export async function toggleLike(postId: string, uid: string): Promise<boolean> 
   }
   await setDoc(likeRef, { createdAt: Timestamp.now() });
   await updateDoc(postRef, { likesCount: increment(1) }).catch(() => {});
+  // Notify post owner (not self-likes).
+  try {
+    const postSnap = await getDoc(postRef);
+    if (postSnap.exists()) {
+      const p = postSnap.data() as { uid: string; type: FeedItemType; payload: Record<string, unknown> };
+      if (p.uid && p.uid !== uid) {
+        const actor = await getPublicUser(uid).catch(() => null);
+        const preview = postPreview(p);
+        await notify(p.uid, "post_like", {
+          postId,
+          actorUid: uid,
+          actorName: actor?.name ?? null,
+          actorUsername: actor?.username ?? null,
+          previewText: preview.text ?? null,
+          previewPhoto: preview.photo ?? null,
+        });
+      }
+    }
+  } catch { /* non-fatal */ }
   return true;
 }
 
@@ -133,8 +200,27 @@ export async function addComment(postId: string, uid: string, text: string): Pro
     uid, text: t, createdAt: Timestamp.now(),
   });
   await updateDoc(doc(getDb(), "activity_feed", postId), { commentsCount: increment(1) }).catch(() => {});
-  // touch to bump activity
   void serverTimestamp;
+  // Notify post owner (not self-comments).
+  try {
+    const postSnap = await getDoc(doc(getDb(), "activity_feed", postId));
+    if (postSnap.exists()) {
+      const p = postSnap.data() as { uid: string; type: FeedItemType; payload: Record<string, unknown> };
+      if (p.uid && p.uid !== uid) {
+        const actor = await getPublicUser(uid).catch(() => null);
+        const preview = postPreview(p);
+        await notify(p.uid, "post_comment", {
+          postId,
+          actorUid: uid,
+          actorName: actor?.name ?? null,
+          actorUsername: actor?.username ?? null,
+          commentText: t.slice(0, 120),
+          previewText: preview.text ?? null,
+          previewPhoto: preview.photo ?? null,
+        });
+      }
+    }
+  } catch { /* non-fatal */ }
 }
 
 export async function deleteComment(postId: string, commentId: string): Promise<void> {
@@ -175,7 +261,9 @@ export type NotificationType =
   | "workout_reminder"
   | "meal_reminder"
   | "streak_warning"
-  | "leaderboard_update";
+  | "leaderboard_update"
+  | "post_like"
+  | "post_comment";
 
 export type Notification = {
   id: string;
@@ -203,6 +291,28 @@ export async function listNotifications(uid: string, max = 50): Promise<Notifica
 
 export async function markNotificationRead(uid: string, id: string) {
   await updateDoc(doc(getDb(), "notifications", uid, "items", id), { read: true });
+}
+
+export function subscribeNotifications(uid: string, cb: (items: Notification[]) => void, max = 50) {
+  const q = query(collection(getDb(), "notifications", uid, "items"),
+    orderBy("createdAt", "desc"), limit(max));
+  return onSnapshot(q, (snap) => {
+    cb(snap.docs.map((d) => {
+      const data = d.data() as { type: NotificationType; payload: Record<string, unknown>; read: boolean; createdAt: Timestamp };
+      return { id: d.id, type: data.type, payload: data.payload ?? {}, read: !!data.read, createdAt: data.createdAt?.toDate?.() ?? new Date() };
+    }));
+  }, () => cb([]));
+}
+
+export function subscribeUnreadCount(uid: string, cb: (n: number) => void) {
+  const q = query(collection(getDb(), "notifications", uid, "items"), where("read", "==", false), limit(100));
+  return onSnapshot(q, (snap) => cb(snap.size), () => cb(0));
+}
+
+export async function markAllNotificationsRead(uid: string): Promise<void> {
+  const q = query(collection(getDb(), "notifications", uid, "items"), where("read", "==", false), limit(200));
+  const snap = await getDocs(q);
+  await Promise.all(snap.docs.map((d) => updateDoc(d.ref, { read: true }).catch(() => {})));
 }
 
 // ---------- Denormalized stats ----------

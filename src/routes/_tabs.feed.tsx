@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Dumbbell, Target, Flame, Trophy, Scale, Ruler, Rss, UserPlus, MessageCircle, Heart, Image as ImageIcon, Film, X, Send, Trash2 } from "lucide-react";
+import { createFileRoute, Link, useSearch, useNavigate } from "@tanstack/react-router";
+import { Dumbbell, Target, Flame, Trophy, Scale, Ruler, Rss, UserPlus, MessageCircle, Heart, Image as ImageIcon, Film, X, Send, Trash2, Bell } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import {
   subscribeFeed, createPost, toggleLike, hasLiked, subscribeComments, addComment, deleteComment,
+  subscribeUnreadCount,
   type FeedItem, type FeedItemType, type Comment,
 } from "@/lib/social";
 import { listFriendUids } from "@/lib/friends";
@@ -11,6 +12,7 @@ import { getPublicUser, type PublicUser } from "@/lib/usernames";
 
 export const Route = createFileRoute("/_tabs/feed")({
   head: () => ({ meta: [{ title: "Feed — Forme" }] }),
+  validateSearch: (s: Record<string, unknown>) => ({ post: typeof s.post === "string" ? s.post : undefined }),
   component: Feed,
 });
 
@@ -51,10 +53,19 @@ function relTime(d: Date): string {
 
 function Feed() {
   const { profile } = useAuth();
+  const search = useSearch({ from: "/_tabs/feed" });
+  const navigate = useNavigate();
   const [items, setItems] = useState<FeedItem[] | null>(null);
   const [users, setUsers] = useState<Record<string, PublicUser | null>>({});
   const [composerOpen, setComposerOpen] = useState(false);
   const [openComments, setOpenComments] = useState<string | null>(null);
+  const [unread, setUnread] = useState(0);
+
+  useEffect(() => {
+    if (!profile) return;
+    const unsub = subscribeUnreadCount(profile.uid, setUnread);
+    return () => unsub();
+  }, [profile?.uid]);
 
   // Subscribe in real time to activity_feed, filtered to self+friends.
   useEffect(() => {
@@ -82,6 +93,21 @@ function Feed() {
     return () => { cancelled = true; if (unsub) unsub(); };
   }, [profile?.uid]);
 
+  // Scroll to highlighted post from a notification (once items are loaded).
+  useEffect(() => {
+    const target = search.post;
+    if (!target || !items) return;
+    const el = document.getElementById(`post-${target}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.classList.add("ring-2", "ring-accent");
+      const t = setTimeout(() => el.classList.remove("ring-2", "ring-accent"), 2000);
+      // clear the search param so it doesn't re-trigger
+      navigate({ to: "/feed", search: {} as never, replace: true });
+      return () => clearTimeout(t);
+    }
+  }, [search.post, items, navigate]);
+
   if (!profile) return null;
 
   return (
@@ -89,6 +115,14 @@ function Feed() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Feed</h1>
         <div className="flex items-center gap-2">
+          <Link to="/notifications" aria-label="Notifications" className="relative size-10 rounded-full bg-secondary flex items-center justify-center">
+            <Bell className="size-5" />
+            {unread > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center border-2 border-background">
+                {unread > 99 ? "99+" : unread}
+              </span>
+            )}
+          </Link>
           <button onClick={() => setComposerOpen(true)} aria-label="New post" className="size-10 rounded-full bg-black text-white flex items-center justify-center">
             <ImageIcon className="size-5" />
           </button>
@@ -173,7 +207,7 @@ function PostCard({ item, user, selfUid, onOpenComments }: {
   };
 
   return (
-    <div className="surface p-4">
+    <div id={`post-${item.id}`} className="surface p-4 transition-shadow">
       <div className="flex gap-3">
         <Link to="/u/$uid" params={{ uid: item.uid }} className="size-10 rounded-full bg-secondary flex items-center justify-center text-sm font-semibold shrink-0">
           {(user?.name ?? user?.username ?? "?").charAt(0).toUpperCase()}
@@ -234,6 +268,7 @@ function Composer({ uid, onClose }: { uid: string; onClose: () => void }) {
   const [files, setFiles] = useState<File[]>([]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const pick = (accept: string) => {
@@ -257,9 +292,9 @@ function Composer({ uid, onClose }: { uid: string; onClose: () => void }) {
 
   const submit = async () => {
     if (!text.trim() && files.length === 0) return;
-    setBusy(true); setErr(null);
+    setBusy(true); setErr(null); setProgress(0);
     try {
-      await createPost(uid, text, files);
+      await createPost(uid, text, files, setProgress);
       onClose();
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Failed to publish");
@@ -304,6 +339,14 @@ function Composer({ uid, onClose }: { uid: string; onClose: () => void }) {
           </button>
         </div>
         {err && <p className="mt-2 text-xs text-destructive">{err}</p>}
+        {busy && files.length > 0 && (
+          <div className="mt-3">
+            <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+              <div className="h-full bg-black transition-all duration-200" style={{ width: `${progress}%` }} />
+            </div>
+            <p className="mt-1 text-[11px] text-foreground/50 text-right">Uploading… {progress}%</p>
+          </div>
+        )}
       </div>
     </div>
   );

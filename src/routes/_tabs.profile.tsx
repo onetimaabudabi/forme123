@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { listAchievements, ACHIEVEMENTS } from "@/lib/achievements";
 import { listWorkoutHistory } from "@/lib/workouts";
+import { subscribeUnreadCount } from "@/lib/social";
 
 export const Route = createFileRoute("/_tabs/profile")({
   head: () => ({ meta: [{ title: "Profile — Forme" }] }),
@@ -28,12 +29,19 @@ function Profile() {
   const navigate = useNavigate();
   const [unlocked, setUnlocked] = useState<number>(0);
   const [workoutCount, setWorkoutCount] = useState<number>(0);
+  const [unread, setUnread] = useState<number>(0);
 
   useEffect(() => {
     if (!profile) return;
     listAchievements(profile.uid).then((a) => setUnlocked(a.length)).catch(() => {});
     listWorkoutHistory(profile.uid, 200).then((w) => setWorkoutCount(w.length)).catch(() => {});
   }, [profile]);
+
+  useEffect(() => {
+    if (!profile) return;
+    const unsub = subscribeUnreadCount(profile.uid, setUnread);
+    return () => unsub();
+  }, [profile?.uid]);
 
   if (!profile) return null;
 
@@ -77,7 +85,16 @@ function Profile() {
       <div className="mt-6 surface overflow-hidden divide-y divide-black/5">
         <Row to="/edit-profile" icon={UserCog} label="Edit profile" hint="Name · weight · goal" />
         <Row to="/add-friend" icon={UserPlus} label="Add friend" hint={profile.friendCode ?? undefined} />
-        <Row to="/notifications" icon={Bell} label="Notifications" />
+        <Link to="/notifications" className="flex items-center gap-3 px-4 py-3.5 hover:bg-foreground/[0.02] transition">
+          <div className="size-9 rounded-xl bg-secondary flex items-center justify-center"><Bell className="size-[18px]" /></div>
+          <span className="flex-1 text-[15px] font-medium">Notifications</span>
+          {unread > 0 && (
+            <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[11px] font-bold flex items-center justify-center">
+              {unread > 99 ? "99+" : unread}
+            </span>
+          )}
+          <ChevronRight className="size-4 text-foreground/30" />
+        </Link>
       </div>
 
       <div className="mt-6 surface overflow-hidden divide-y divide-black/5">
