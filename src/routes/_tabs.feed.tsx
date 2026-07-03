@@ -268,6 +268,7 @@ function Composer({ uid, onClose }: { uid: string; onClose: () => void }) {
   const [files, setFiles] = useState<File[]>([]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const pick = (accept: string) => {
@@ -291,9 +292,9 @@ function Composer({ uid, onClose }: { uid: string; onClose: () => void }) {
 
   const submit = async () => {
     if (!text.trim() && files.length === 0) return;
-    setBusy(true); setErr(null);
+    setBusy(true); setErr(null); setProgress(0);
     try {
-      await createPost(uid, text, files);
+      await createPost(uid, text, files, setProgress);
       onClose();
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Failed to publish");
@@ -338,6 +339,14 @@ function Composer({ uid, onClose }: { uid: string; onClose: () => void }) {
           </button>
         </div>
         {err && <p className="mt-2 text-xs text-destructive">{err}</p>}
+        {busy && files.length > 0 && (
+          <div className="mt-3">
+            <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+              <div className="h-full bg-black transition-all duration-200" style={{ width: `${progress}%` }} />
+            </div>
+            <p className="mt-1 text-[11px] text-foreground/50 text-right">Uploading… {progress}%</p>
+          </div>
+        )}
       </div>
     </div>
   );
