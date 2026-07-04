@@ -1,18 +1,21 @@
 import { createFileRoute, Link, useSearch, useNavigate } from "@tanstack/react-router";
-import { Dumbbell, Target, Flame, Trophy, Scale, Ruler, Rss, UserPlus, MessageCircle, Heart, Image as ImageIcon, Film, X, Send, Trash2, Bell } from "lucide-react";
+import { Dumbbell, Target, Flame, Trophy, Scale, Ruler, Rss, MessageCircle, Heart, Image as ImageIcon, Film, X, Send, Trash2, Bell, Search as SearchIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import {
-  subscribeFeed, createPost, toggleLike, hasLiked, subscribeComments, addComment, deleteComment,
+  subscribeFeed, subscribeDiscoverFeed, createPost, toggleLike, hasLiked, subscribeComments, addComment, deleteComment,
   subscribeUnreadCount,
   type FeedItem, type FeedItemType, type Comment,
 } from "@/lib/social";
-import { listFriendUids } from "@/lib/friends";
+import { listFollowingUids, subscribeFollowing } from "@/lib/follows";
 import { getPublicUser, type PublicUser } from "@/lib/usernames";
 
 export const Route = createFileRoute("/_tabs/feed")({
   head: () => ({ meta: [{ title: "Feed — Forme" }] }),
-  validateSearch: (s: Record<string, unknown>) => ({ post: typeof s.post === "string" ? s.post : undefined }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    post: typeof s.post === "string" ? s.post : undefined,
+    tab: s.tab === "discover" ? "discover" : "following",
+  }),
   component: Feed,
 });
 
@@ -56,10 +59,12 @@ function Feed() {
   const search = useSearch({ from: "/_tabs/feed" });
   const navigate = useNavigate();
   const [items, setItems] = useState<FeedItem[] | null>(null);
+  const [discover, setDiscover] = useState<FeedItem[] | null>(null);
   const [users, setUsers] = useState<Record<string, PublicUser | null>>({});
   const [composerOpen, setComposerOpen] = useState(false);
   const [openComments, setOpenComments] = useState<string | null>(null);
   const [unread, setUnread] = useState(0);
+  const tab: "following" | "discover" = search.tab ?? "following";
 
   useEffect(() => {
     if (!profile) return;
@@ -67,31 +72,50 @@ function Feed() {
     return () => unsub();
   }, [profile?.uid]);
 
-  // Subscribe in real time to activity_feed, filtered to self+friends.
+  // Following tab: self + everyone I follow. Refresh set when following changes.
   useEffect(() => {
     if (!profile) return;
-    let unsub: (() => void) | null = null;
-    let cancelled = false;
-    (async () => {
-      const friends = await listFriendUids(profile.uid).catch(() => []);
-      if (cancelled) return;
-      const uids = Array.from(new Set([profile.uid, ...friends]));
-      unsub = subscribeFeed(uids, (feed) => {
-        setItems(feed);
-        // hydrate any new users.
-        const need = Array.from(new Set(feed.map((i) => i.uid)));
-        setUsers((prev) => {
-          const missing = need.filter((u) => !(u in prev));
-          if (missing.length) {
-            void Promise.all(missing.map(async (u) => [u, await getPublicUser(u).catch(() => null)] as const))
-              .then((pairs) => setUsers((cur) => ({ ...cur, ...Object.fromEntries(pairs) })));
-          }
-          return prev;
-        });
-      }, 100);
-    })();
-    return () => { cancelled = true; if (unsub) unsub(); };
+    let unsubFeed: (() => void) | null = null;
+    const hydrateFrom = (feed: FeedItem[]) => {
+      const need = Array.from(new Set(feed.map((i) => i.uid)));
+      setUsers((prev) => {
+        const missing = need.filter((u) => !(u in prev));
+        if (missing.length) {
+          void Promise.all(missing.map(async (u) => [u, await getPublicUser(u).catch(() => null)] as const))
+            .then((pairs) => setUsers((cur) => ({ ...cur, ...Object.fromEntries(pairs) })));
+        }
+        return prev;
+      });
+    };
+    const rebuild = (uids: string[]) => {
+      if (unsubFeed) unsubFeed();
+      unsubFeed = subscribeFeed(uids, (feed) => { setItems(feed); hydrateFrom(feed); }, 100);
+    };
+    // Initial fetch + live updates when I follow/unfollow someone.
+    void listFollowingUids(profile.uid).then((fs) => rebuild(Array.from(new Set([profile.uid, ...fs]))));
+    const unsubFollow = subscribeFollowing(profile.uid, (edges) => {
+      rebuild(Array.from(new Set([profile.uid, ...edges.map((e) => e.uid)])));
+    });
+    return () => { unsubFollow(); if (unsubFeed) unsubFeed(); };
   }, [profile?.uid]);
+
+  // Discover: everyone.
+  useEffect(() => {
+    if (!profile || tab !== "discover") return;
+    const unsub = subscribeDiscoverFeed((feed) => {
+      setDiscover(feed);
+      const need = Array.from(new Set(feed.map((i) => i.uid)));
+      setUsers((prev) => {
+        const missing = need.filter((u) => !(u in prev));
+        if (missing.length) {
+          void Promise.all(missing.map(async (u) => [u, await getPublicUser(u).catch(() => null)] as const))
+            .then((pairs) => setUsers((cur) => ({ ...cur, ...Object.fromEntries(pairs) })));
+        }
+        return prev;
+      });
+    }, 100);
+    return () => unsub();
+  }, [profile?.uid, tab]);
 
   // Scroll to highlighted post from a notification (once items are loaded).
   useEffect(() => {
@@ -109,12 +133,16 @@ function Feed() {
   }, [search.post, items, navigate]);
 
   if (!profile) return null;
+  const list = tab === "discover" ? discover : items;
 
   return (
     <div className="px-6 pt-14">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Feed</h1>
         <div className="flex items-center gap-2">
+          <Link to="/search" aria-label="Search" className="size-10 rounded-full bg-secondary flex items-center justify-center">
+            <SearchIcon className="size-5" />
+          </Link>
           <Link to="/notifications" aria-label="Notifications" className="relative size-10 rounded-full bg-secondary flex items-center justify-center">
             <Bell className="size-5" />
             {unread > 0 && (
@@ -126,30 +154,40 @@ function Feed() {
           <button onClick={() => setComposerOpen(true)} aria-label="New post" className="size-10 rounded-full bg-black text-white flex items-center justify-center">
             <ImageIcon className="size-5" />
           </button>
-          <Link to="/add-friend" className="size-10 rounded-full bg-secondary flex items-center justify-center"><UserPlus className="size-5" /></Link>
         </div>
       </div>
-      <p className="text-sm text-foreground/50 mt-1">What your friends are up to.</p>
 
-      {items === null ? (
+      <div className="mt-4 inline-flex p-1 rounded-full bg-secondary">
+        {(["following", "discover"] as const).map((k) => (
+          <button
+            key={k}
+            onClick={() => navigate({ to: "/feed", search: (prev) => ({ ...prev, tab: k }) as never, replace: true })}
+            className={`h-8 px-4 rounded-full text-xs font-semibold capitalize transition ${tab === k ? "bg-background shadow" : "text-foreground/60"}`}
+          >
+            {k}
+          </button>
+        ))}
+      </div>
+
+      {list === null ? (
         <p className="mt-10 text-sm text-foreground/40">Loading…</p>
-      ) : items.length === 0 ? (
+      ) : list.length === 0 ? (
         <div className="mt-8 surface p-8 text-center">
           <Rss className="size-8 text-foreground/30 mx-auto" />
-          <p className="mt-3 text-sm text-foreground/60 font-semibold">No activity yet</p>
-          <p className="text-xs text-foreground/40 mt-1 max-w-[240px] mx-auto">Share your first post or add friends to see their workouts, missions and milestones here.</p>
+          <p className="mt-3 text-sm text-foreground/60 font-semibold">Nothing here yet</p>
+          <p className="text-xs text-foreground/40 mt-1 max-w-[240px] mx-auto">{tab === "following" ? "Share a post or follow someone to see updates here." : "Be the first to share something."}</p>
           <div className="mt-5 flex items-center gap-2 justify-center">
             <button onClick={() => setComposerOpen(true)} className="inline-flex items-center gap-2 h-11 px-5 rounded-full bg-black text-white font-semibold text-xs">
               <ImageIcon className="size-4" /> New post
             </button>
-            <Link to="/add-friend" className="inline-flex items-center gap-2 h-11 px-5 rounded-full bg-secondary font-semibold text-xs">
-              <UserPlus className="size-4" /> Add friend
+            <Link to="/search" className="inline-flex items-center gap-2 h-11 px-5 rounded-full bg-secondary font-semibold text-xs">
+              <SearchIcon className="size-4" /> Find people
             </Link>
           </div>
         </div>
       ) : (
         <div className="mt-5 space-y-2">
-          {items.map((it) => {
+          {list.map((it) => {
             const user = users[it.uid];
             return (
               <PostCard
