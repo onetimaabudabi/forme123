@@ -17,6 +17,10 @@ export type UserProfile = {
   streak: number;
   username?: string;
   friendCode?: string;
+  bio?: string;
+  photoURL?: string;
+  followersCount?: number;
+  followingCount?: number;
   stats?: {
     totalWorkouts?: number;
     currentStreak?: number;
