@@ -57,6 +57,62 @@ export function subscribeFeed(uids: string[], onItems: (items: FeedItem[]) => vo
   });
 }
 
+/** Real-time subscription to ALL public activity_feed items (Discover). */
+export function subscribeDiscoverFeed(onItems: (items: FeedItem[]) => void, max = 100) {
+  const q = query(collection(getDb(), "activity_feed"), orderBy("createdAt", "desc"), limit(max));
+  return onSnapshot(q, (snap) => {
+    const items: FeedItem[] = snap.docs.map((d) => {
+      const data = d.data() as { uid: string; type: FeedItemType; payload: Record<string, unknown>; createdAt: Timestamp; likesCount?: number; commentsCount?: number };
+      return {
+        id: d.id, uid: data.uid, type: data.type,
+        payload: data.payload ?? {},
+        createdAt: data.createdAt?.toDate?.() ?? new Date(),
+        likesCount: data.likesCount ?? 0,
+        commentsCount: data.commentsCount ?? 0,
+      };
+    });
+    onItems(items);
+  }, (err) => { console.error("subscribeDiscoverFeed error", err); onItems([]); });
+}
+
+/** Real-time subscription to a single user's posts (all activity_feed items). */
+export function subscribeUserPosts(uid: string, onItems: (items: FeedItem[]) => void, max = 200) {
+  const q = query(collection(getDb(), "activity_feed"), where("uid", "==", uid), orderBy("createdAt", "desc"), limit(max));
+  return onSnapshot(q, (snap) => {
+    onItems(snap.docs.map((d) => {
+      const data = d.data() as { uid: string; type: FeedItemType; payload: Record<string, unknown>; createdAt: Timestamp; likesCount?: number; commentsCount?: number };
+      return {
+        id: d.id, uid: data.uid, type: data.type,
+        payload: data.payload ?? {},
+        createdAt: data.createdAt?.toDate?.() ?? new Date(),
+        likesCount: data.likesCount ?? 0,
+        commentsCount: data.commentsCount ?? 0,
+      };
+    }));
+  }, () => onItems([]));
+}
+
+/** Real-time subscription to a single post document. */
+export function subscribePost(postId: string, cb: (item: FeedItem | null) => void) {
+  return onSnapshot(doc(getDb(), "activity_feed", postId), (snap) => {
+    if (!snap.exists()) { cb(null); return; }
+    const data = snap.data() as { uid: string; type: FeedItemType; payload: Record<string, unknown>; createdAt: Timestamp; likesCount?: number; commentsCount?: number };
+    cb({
+      id: snap.id, uid: data.uid, type: data.type,
+      payload: data.payload ?? {},
+      createdAt: data.createdAt?.toDate?.() ?? new Date(),
+      likesCount: data.likesCount ?? 0,
+      commentsCount: data.commentsCount ?? 0,
+    });
+  }, () => cb(null));
+}
+
+/** Real-time subscription to the users who liked a post. */
+export function subscribePostLikes(postId: string, cb: (uids: string[]) => void, max = 200) {
+  const q = query(collection(getDb(), "activity_feed", postId, "likes"), limit(max));
+  return onSnapshot(q, (snap) => cb(snap.docs.map((d) => d.id)), () => cb([]));
+}
+
 // ---------- Posts (text + media) ----------
 
 export type MediaKind = "image" | "video";
