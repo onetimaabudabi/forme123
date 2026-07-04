@@ -31,6 +31,7 @@ import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as TabsRouteImport } from './routes/_tabs'
 import { Route as TabsIndexRouteImport } from './routes/_tabs.index'
 import { Route as UUidRouteImport } from './routes/u.$uid'
+import { Route as FollowersUidRouteImport } from './routes/followers.$uid'
 import { Route as TabsWorkoutRouteImport } from './routes/_tabs.workout'
 import { Route as TabsProgressRouteImport } from './routes/_tabs.progress'
 import { Route as TabsProfileRouteImport } from './routes/_tabs.profile'
@@ -146,6 +147,11 @@ const UUidRoute = UUidRouteImport.update({
   path: '/u/$uid',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FollowersUidRoute = FollowersUidRouteImport.update({
+  id: '/followers/$uid',
+  path: '/followers/$uid',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TabsWorkoutRoute = TabsWorkoutRouteImport.update({
   id: '/workout',
   path: '/workout',
@@ -198,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof TabsProfileRoute
   '/progress': typeof TabsProgressRoute
   '/workout': typeof TabsWorkoutRoute
+  '/followers/$uid': typeof FollowersUidRoute
   '/u/$uid': typeof UUidRoute
 }
 export interface FileRoutesByTo {
@@ -225,6 +232,7 @@ export interface FileRoutesByTo {
   '/profile': typeof TabsProfileRoute
   '/progress': typeof TabsProgressRoute
   '/workout': typeof TabsWorkoutRoute
+  '/followers/$uid': typeof FollowersUidRoute
   '/u/$uid': typeof UUidRoute
   '/': typeof TabsIndexRoute
 }
@@ -255,6 +263,7 @@ export interface FileRoutesById {
   '/_tabs/profile': typeof TabsProfileRoute
   '/_tabs/progress': typeof TabsProgressRoute
   '/_tabs/workout': typeof TabsWorkoutRoute
+  '/followers/$uid': typeof FollowersUidRoute
   '/u/$uid': typeof UUidRoute
   '/_tabs/': typeof TabsIndexRoute
 }
@@ -286,6 +295,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/workout'
+    | '/followers/$uid'
     | '/u/$uid'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -313,6 +323,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/workout'
+    | '/followers/$uid'
     | '/u/$uid'
     | '/'
   id:
@@ -342,6 +353,7 @@ export interface FileRouteTypes {
     | '/_tabs/profile'
     | '/_tabs/progress'
     | '/_tabs/workout'
+    | '/followers/$uid'
     | '/u/$uid'
     | '/_tabs/'
   fileRoutesById: FileRoutesById
@@ -367,6 +379,7 @@ export interface RootRouteChildren {
   SleepRoute: typeof SleepRoute
   StreakRoute: typeof StreakRoute
   SubscriptionRoute: typeof SubscriptionRoute
+  FollowersUidRoute: typeof FollowersUidRoute
   UUidRoute: typeof UUidRoute
 }
 
@@ -526,6 +539,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UUidRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/followers/$uid': {
+      id: '/followers/$uid'
+      path: '/followers/$uid'
+      fullPath: '/followers/$uid'
+      preLoaderRoute: typeof FollowersUidRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_tabs/workout': {
       id: '/_tabs/workout'
       path: '/workout'
@@ -605,6 +625,7 @@ const rootRouteChildren: RootRouteChildren = {
   SleepRoute: SleepRoute,
   StreakRoute: StreakRoute,
   SubscriptionRoute: SubscriptionRoute,
+  FollowersUidRoute: FollowersUidRoute,
   UUidRoute: UUidRoute,
 }
 export const routeTree = rootRouteImport
