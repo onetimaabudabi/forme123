@@ -161,7 +161,7 @@ function Feed() {
         {(["following", "discover"] as const).map((k) => (
           <button
             key={k}
-            onClick={() => navigate({ to: "/feed", search: (prev) => ({ ...prev, tab: k }) as never, replace: true })}
+            onClick={() => navigate({ to: "/feed", search: (prev: Record<string, unknown>) => ({ ...prev, tab: k }) as never, replace: true })}
             className={`h-8 px-4 rounded-full text-xs font-semibold capitalize transition ${tab === k ? "bg-background shadow" : "text-foreground/60"}`}
           >
             {k}
