@@ -31,6 +31,7 @@ import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as TabsRouteImport } from './routes/_tabs'
 import { Route as TabsIndexRouteImport } from './routes/_tabs.index'
 import { Route as UUidRouteImport } from './routes/u.$uid'
+import { Route as LikesPostIdRouteImport } from './routes/likes.$postId'
 import { Route as FollowingUidRouteImport } from './routes/following.$uid'
 import { Route as FollowersUidRouteImport } from './routes/followers.$uid'
 import { Route as TabsWorkoutRouteImport } from './routes/_tabs.workout'
@@ -148,6 +149,11 @@ const UUidRoute = UUidRouteImport.update({
   path: '/u/$uid',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LikesPostIdRoute = LikesPostIdRouteImport.update({
+  id: '/likes/$postId',
+  path: '/likes/$postId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FollowingUidRoute = FollowingUidRouteImport.update({
   id: '/following/$uid',
   path: '/following/$uid',
@@ -212,6 +218,7 @@ export interface FileRoutesByFullPath {
   '/workout': typeof TabsWorkoutRoute
   '/followers/$uid': typeof FollowersUidRoute
   '/following/$uid': typeof FollowingUidRoute
+  '/likes/$postId': typeof LikesPostIdRoute
   '/u/$uid': typeof UUidRoute
 }
 export interface FileRoutesByTo {
@@ -241,6 +248,7 @@ export interface FileRoutesByTo {
   '/workout': typeof TabsWorkoutRoute
   '/followers/$uid': typeof FollowersUidRoute
   '/following/$uid': typeof FollowingUidRoute
+  '/likes/$postId': typeof LikesPostIdRoute
   '/u/$uid': typeof UUidRoute
   '/': typeof TabsIndexRoute
 }
@@ -273,6 +281,7 @@ export interface FileRoutesById {
   '/_tabs/workout': typeof TabsWorkoutRoute
   '/followers/$uid': typeof FollowersUidRoute
   '/following/$uid': typeof FollowingUidRoute
+  '/likes/$postId': typeof LikesPostIdRoute
   '/u/$uid': typeof UUidRoute
   '/_tabs/': typeof TabsIndexRoute
 }
@@ -306,6 +315,7 @@ export interface FileRouteTypes {
     | '/workout'
     | '/followers/$uid'
     | '/following/$uid'
+    | '/likes/$postId'
     | '/u/$uid'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -335,6 +345,7 @@ export interface FileRouteTypes {
     | '/workout'
     | '/followers/$uid'
     | '/following/$uid'
+    | '/likes/$postId'
     | '/u/$uid'
     | '/'
   id:
@@ -366,6 +377,7 @@ export interface FileRouteTypes {
     | '/_tabs/workout'
     | '/followers/$uid'
     | '/following/$uid'
+    | '/likes/$postId'
     | '/u/$uid'
     | '/_tabs/'
   fileRoutesById: FileRoutesById
@@ -393,6 +405,7 @@ export interface RootRouteChildren {
   SubscriptionRoute: typeof SubscriptionRoute
   FollowersUidRoute: typeof FollowersUidRoute
   FollowingUidRoute: typeof FollowingUidRoute
+  LikesPostIdRoute: typeof LikesPostIdRoute
   UUidRoute: typeof UUidRoute
 }
 
@@ -552,6 +565,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UUidRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/likes/$postId': {
+      id: '/likes/$postId'
+      path: '/likes/$postId'
+      fullPath: '/likes/$postId'
+      preLoaderRoute: typeof LikesPostIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/following/$uid': {
       id: '/following/$uid'
       path: '/following/$uid'
@@ -647,6 +667,7 @@ const rootRouteChildren: RootRouteChildren = {
   SubscriptionRoute: SubscriptionRoute,
   FollowersUidRoute: FollowersUidRoute,
   FollowingUidRoute: FollowingUidRoute,
+  LikesPostIdRoute: LikesPostIdRoute,
   UUidRoute: UUidRoute,
 }
 export const routeTree = rootRouteImport
