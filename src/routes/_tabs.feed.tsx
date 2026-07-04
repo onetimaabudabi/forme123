@@ -288,8 +288,8 @@ function PostCard({ item, user, selfUid, onOpenComments }: {
       <div className="mt-3 flex items-center gap-1 text-foreground/60">
         <button onClick={like} disabled={busy} className={`h-9 px-3 rounded-full flex items-center gap-1.5 text-xs font-semibold transition ${liked ? "text-rose-500 bg-rose-500/10" : "hover:bg-secondary"}`}>
           <Heart className={`size-4 ${liked ? "fill-current" : ""}`} />
-          <span>{likes}</span>
         </button>
+        <Link to="/likes/$postId" params={{ postId: item.id }} className="h-9 px-2 text-xs font-semibold hover:underline">{likes} likes</Link>
         <button onClick={onOpenComments} className="h-9 px-3 rounded-full flex items-center gap-1.5 text-xs font-semibold hover:bg-secondary">
           <MessageCircle className="size-4" />
           <span>{item.commentsCount ?? 0}</span>
