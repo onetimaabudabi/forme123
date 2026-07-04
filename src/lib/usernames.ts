@@ -8,6 +8,10 @@ export type PublicUser = {
   name?: string;
   goal?: string;
   streak?: number;
+  bio?: string;
+  photoURL?: string;
+  followersCount?: number;
+  followingCount?: number;
   stats?: { totalWorkouts?: number; currentStreak?: number; longestStreak?: number; activeDays?: number; totalMissions?: number; caloriesBurned?: number };
 };
 
@@ -137,6 +141,10 @@ function toPublic(uid: string, data: Record<string, unknown>): PublicUser {
     name: data.name as string | undefined,
     goal: data.goal as string | undefined,
     streak: data.streak as number | undefined,
+    bio: data.bio as string | undefined,
+    photoURL: data.photoURL as string | undefined,
+    followersCount: data.followersCount as number | undefined,
+    followingCount: data.followingCount as number | undefined,
     stats: data.stats as PublicUser["stats"],
   };
 }
