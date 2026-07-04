@@ -1,134 +1,18 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ChevronRight, Trophy, Apple, Settings, Bell, Shield, HelpCircle, LogOut, Flame, Calendar, Users, Crown, History, Ruler, Moon, Sparkles, UserCog, CalendarDays, UserPlus, Rss } from "lucide-react";
-import { useEffect, useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
-import { listAchievements, ACHIEVEMENTS } from "@/lib/achievements";
-import { listWorkoutHistory } from "@/lib/workouts";
-import { subscribeUnreadCount } from "@/lib/social";
+import { ProfileView } from "@/components/ProfileView";
 
 export const Route = createFileRoute("/_tabs/profile")({
   head: () => ({ meta: [{ title: "Profile — Forme" }] }),
-  component: Profile,
+  component: MyProfile,
 });
 
-function Row({ to, icon: Icon, label, hint }: { to: string; icon: typeof Trophy; label: string; hint?: string }) {
-  return (
-    <Link to={to as "/"} className="flex items-center gap-3 px-4 py-3.5 hover:bg-foreground/[0.02] transition">
-      <div className="size-9 rounded-xl bg-secondary flex items-center justify-center">
-        <Icon className="size-[18px]" />
-      </div>
-      <span className="flex-1 text-[15px] font-medium">{label}</span>
-      {hint && <span className="text-xs text-foreground/40">{hint}</span>}
-      <ChevronRight className="size-4 text-foreground/30" />
-    </Link>
-  );
-}
-
-function Profile() {
-  const { profile, signOut } = useAuth();
-  const navigate = useNavigate();
-  const [unlocked, setUnlocked] = useState<number>(0);
-  const [workoutCount, setWorkoutCount] = useState<number>(0);
-  const [unread, setUnread] = useState<number>(0);
-
-  useEffect(() => {
-    if (!profile) return;
-    listAchievements(profile.uid).then((a) => setUnlocked(a.length)).catch(() => {});
-    listWorkoutHistory(profile.uid, 200).then((w) => setWorkoutCount(w.length)).catch(() => {});
-  }, [profile]);
-
-  useEffect(() => {
-    if (!profile) return;
-    const unsub = subscribeUnreadCount(profile.uid, setUnread);
-    return () => unsub();
-  }, [profile?.uid]);
-
+function MyProfile() {
+  const { profile } = useAuth();
   if (!profile) return null;
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate({ to: "/signin" });
-  };
-
-  const goalLabel: Record<string, string> = {
-    weight_loss: "Weight Loss",
-    muscle_gain: "Muscle Gain",
-    maintain: "Maintain Fitness",
-  };
-
   return (
-    <div className="px-6 pt-14">
-      <div className="flex flex-col items-center text-center">
-        <div className="size-24 rounded-full bg-secondary flex items-center justify-center text-3xl font-bold">
-          {profile.name?.charAt(0).toUpperCase() ?? "?"}
-        </div>
-        <h1 className="mt-4 text-2xl font-bold tracking-tight">{profile.name}</h1>
-        <p className="text-sm text-foreground/50">{profile.email}</p>
-        <div className="mt-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black text-white text-xs font-semibold">
-          ✦ {goalLabel[profile.goal] ?? "Forme"}
-        </div>
-      </div>
-
-      <div className="mt-6 grid grid-cols-3 gap-3">
-        {[
-          { v: String(profile.streak ?? 0), l: "Day streak" },
-          { v: `${profile.weight}`, l: "Weight kg" },
-          { v: `${profile.height}`, l: "Height cm" },
-        ].map((s) => (
-          <div key={s.l} className="surface py-4 text-center">
-            <p className="text-xl font-bold tracking-tight">{s.v}</p>
-            <p className="text-[11px] text-foreground/50 mt-0.5 font-medium">{s.l}</p>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-6 surface overflow-hidden divide-y divide-black/5">
-        <Row to="/edit-profile" icon={UserCog} label="Edit profile" hint="Name · weight · goal" />
-        <Row to="/add-friend" icon={UserPlus} label="Add friend" hint={profile.friendCode ?? undefined} />
-        <Link to="/notifications" className="flex items-center gap-3 px-4 py-3.5 hover:bg-foreground/[0.02] transition">
-          <div className="size-9 rounded-xl bg-secondary flex items-center justify-center"><Bell className="size-[18px]" /></div>
-          <span className="flex-1 text-[15px] font-medium">Notifications</span>
-          {unread > 0 && (
-            <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[11px] font-bold flex items-center justify-center">
-              {unread > 99 ? "99+" : unread}
-            </span>
-          )}
-          <ChevronRight className="size-4 text-foreground/30" />
-        </Link>
-      </div>
-
-      <div className="mt-6 surface overflow-hidden divide-y divide-black/5">
-        <Row to="/activity" icon={CalendarDays} label="Activity calendar" />
-        <Row to="/feed" icon={Rss} label="Friends feed" />
-        <Row to="/achievements" icon={Trophy} label="Achievements" hint={`${unlocked} / ${ACHIEVEMENTS.length}`} />
-        <Row to="/challenges" icon={Flame} label="Daily challenges" />
-        <Row to="/streak" icon={Calendar} label="Streak calendar" hint={`${profile.streak ?? 0} days`} />
-        <Row to="/leaderboard" icon={Crown} label="Leaderboard" />
-        <Row to="/friends" icon={Users} label="Friends" />
-      </div>
-
-      <div className="mt-4 surface overflow-hidden divide-y divide-black/5">
-        <Row to="/history" icon={History} label="Workout history" hint={workoutCount ? String(workoutCount) : undefined} />
-        <Row to="/measurements" icon={Ruler} label="Body measurements" />
-        <Row to="/sleep" icon={Moon} label="Sleep tracking" />
-        <Row to="/meal-plan" icon={Sparkles} label="AI meal plans" />
-        <Row to="/nutrition" icon={Apple} label="Nutrition" />
-      </div>
-
-      <div className="mt-4 surface overflow-hidden divide-y divide-black/5">
-        <Row to="/subscription" icon={Crown} label="Forme Pro" />
-        <Row to="/settings" icon={Settings} label="Settings" />
-      </div>
-
-      <div className="mt-4 surface overflow-hidden divide-y divide-black/5">
-        <Row to="/settings" icon={Bell} label="Notifications" />
-        <Row to="/settings" icon={Shield} label="Privacy" />
-        <Row to="/settings" icon={HelpCircle} label="Help & support" />
-      </div>
-
-      <button onClick={handleSignOut} className="mt-4 w-full surface flex items-center justify-center gap-2 py-4 text-destructive font-semibold text-sm">
-        <LogOut className="size-4" /> Sign out
-      </button>
+    <div className="px-6 pt-14 pb-32">
+      <ProfileView uid={profile.uid} />
     </div>
   );
 }

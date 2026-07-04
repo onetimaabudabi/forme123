@@ -17,6 +17,10 @@ export type UserProfile = {
   streak: number;
   username?: string;
   friendCode?: string;
+  bio?: string;
+  photoURL?: string;
+  followersCount?: number;
+  followingCount?: number;
   stats?: {
     totalWorkouts?: number;
     currentStreak?: number;
@@ -97,7 +101,7 @@ export function useAuth() {
   return ctx;
 }
 
-export async function saveUserProfile(uid: string, email: string, data: Omit<UserProfile, "uid" | "email" | "streak" | "createdAt">) {
+export async function saveUserProfile(uid: string, email: string, data: Partial<Omit<UserProfile, "uid" | "email" | "streak" | "createdAt">> & { name: string }) {
   const db = getDb();
   const ref = doc(db, "users", uid);
   const existing = await getDoc(ref);

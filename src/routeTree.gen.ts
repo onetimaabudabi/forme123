@@ -14,6 +14,7 @@ import { Route as StreakRouteImport } from './routes/streak'
 import { Route as SleepRouteImport } from './routes/sleep'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as ProfileSetupRouteImport } from './routes/profile-setup'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as NutritionRouteImport } from './routes/nutrition'
@@ -31,6 +32,10 @@ import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as TabsRouteImport } from './routes/_tabs'
 import { Route as TabsIndexRouteImport } from './routes/_tabs.index'
 import { Route as UUidRouteImport } from './routes/u.$uid'
+import { Route as PostIdRouteImport } from './routes/post.$id'
+import { Route as LikesPostIdRouteImport } from './routes/likes.$postId'
+import { Route as FollowingUidRouteImport } from './routes/following.$uid'
+import { Route as FollowersUidRouteImport } from './routes/followers.$uid'
 import { Route as TabsWorkoutRouteImport } from './routes/_tabs.workout'
 import { Route as TabsProgressRouteImport } from './routes/_tabs.progress'
 import { Route as TabsProfileRouteImport } from './routes/_tabs.profile'
@@ -60,6 +65,11 @@ const SigninRoute = SigninRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileSetupRoute = ProfileSetupRouteImport.update({
@@ -146,6 +156,26 @@ const UUidRoute = UUidRouteImport.update({
   path: '/u/$uid',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PostIdRoute = PostIdRouteImport.update({
+  id: '/post/$id',
+  path: '/post/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LikesPostIdRoute = LikesPostIdRouteImport.update({
+  id: '/likes/$postId',
+  path: '/likes/$postId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FollowingUidRoute = FollowingUidRouteImport.update({
+  id: '/following/$uid',
+  path: '/following/$uid',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FollowersUidRoute = FollowersUidRouteImport.update({
+  id: '/followers/$uid',
+  path: '/followers/$uid',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TabsWorkoutRoute = TabsWorkoutRouteImport.update({
   id: '/workout',
   path: '/workout',
@@ -188,6 +218,7 @@ export interface FileRoutesByFullPath {
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
   '/profile-setup': typeof ProfileSetupRoute
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/sleep': typeof SleepRoute
@@ -198,6 +229,10 @@ export interface FileRoutesByFullPath {
   '/profile': typeof TabsProfileRoute
   '/progress': typeof TabsProgressRoute
   '/workout': typeof TabsWorkoutRoute
+  '/followers/$uid': typeof FollowersUidRoute
+  '/following/$uid': typeof FollowingUidRoute
+  '/likes/$postId': typeof LikesPostIdRoute
+  '/post/$id': typeof PostIdRoute
   '/u/$uid': typeof UUidRoute
 }
 export interface FileRoutesByTo {
@@ -215,6 +250,7 @@ export interface FileRoutesByTo {
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
   '/profile-setup': typeof ProfileSetupRoute
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/sleep': typeof SleepRoute
@@ -225,6 +261,10 @@ export interface FileRoutesByTo {
   '/profile': typeof TabsProfileRoute
   '/progress': typeof TabsProgressRoute
   '/workout': typeof TabsWorkoutRoute
+  '/followers/$uid': typeof FollowersUidRoute
+  '/following/$uid': typeof FollowingUidRoute
+  '/likes/$postId': typeof LikesPostIdRoute
+  '/post/$id': typeof PostIdRoute
   '/u/$uid': typeof UUidRoute
   '/': typeof TabsIndexRoute
 }
@@ -245,6 +285,7 @@ export interface FileRoutesById {
   '/nutrition': typeof NutritionRoute
   '/onboarding': typeof OnboardingRoute
   '/profile-setup': typeof ProfileSetupRoute
+  '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/sleep': typeof SleepRoute
@@ -255,6 +296,10 @@ export interface FileRoutesById {
   '/_tabs/profile': typeof TabsProfileRoute
   '/_tabs/progress': typeof TabsProgressRoute
   '/_tabs/workout': typeof TabsWorkoutRoute
+  '/followers/$uid': typeof FollowersUidRoute
+  '/following/$uid': typeof FollowingUidRoute
+  '/likes/$postId': typeof LikesPostIdRoute
+  '/post/$id': typeof PostIdRoute
   '/u/$uid': typeof UUidRoute
   '/_tabs/': typeof TabsIndexRoute
 }
@@ -276,6 +321,7 @@ export interface FileRouteTypes {
     | '/nutrition'
     | '/onboarding'
     | '/profile-setup'
+    | '/search'
     | '/settings'
     | '/signin'
     | '/sleep'
@@ -286,6 +332,10 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/workout'
+    | '/followers/$uid'
+    | '/following/$uid'
+    | '/likes/$postId'
+    | '/post/$id'
     | '/u/$uid'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -303,6 +353,7 @@ export interface FileRouteTypes {
     | '/nutrition'
     | '/onboarding'
     | '/profile-setup'
+    | '/search'
     | '/settings'
     | '/signin'
     | '/sleep'
@@ -313,6 +364,10 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/workout'
+    | '/followers/$uid'
+    | '/following/$uid'
+    | '/likes/$postId'
+    | '/post/$id'
     | '/u/$uid'
     | '/'
   id:
@@ -332,6 +387,7 @@ export interface FileRouteTypes {
     | '/nutrition'
     | '/onboarding'
     | '/profile-setup'
+    | '/search'
     | '/settings'
     | '/signin'
     | '/sleep'
@@ -342,6 +398,10 @@ export interface FileRouteTypes {
     | '/_tabs/profile'
     | '/_tabs/progress'
     | '/_tabs/workout'
+    | '/followers/$uid'
+    | '/following/$uid'
+    | '/likes/$postId'
+    | '/post/$id'
     | '/u/$uid'
     | '/_tabs/'
   fileRoutesById: FileRoutesById
@@ -362,11 +422,16 @@ export interface RootRouteChildren {
   NutritionRoute: typeof NutritionRoute
   OnboardingRoute: typeof OnboardingRoute
   ProfileSetupRoute: typeof ProfileSetupRoute
+  SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRoute
   SigninRoute: typeof SigninRoute
   SleepRoute: typeof SleepRoute
   StreakRoute: typeof StreakRoute
   SubscriptionRoute: typeof SubscriptionRoute
+  FollowersUidRoute: typeof FollowersUidRoute
+  FollowingUidRoute: typeof FollowingUidRoute
+  LikesPostIdRoute: typeof LikesPostIdRoute
+  PostIdRoute: typeof PostIdRoute
   UUidRoute: typeof UUidRoute
 }
 
@@ -405,6 +470,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile-setup': {
@@ -526,6 +598,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UUidRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/post/$id': {
+      id: '/post/$id'
+      path: '/post/$id'
+      fullPath: '/post/$id'
+      preLoaderRoute: typeof PostIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/likes/$postId': {
+      id: '/likes/$postId'
+      path: '/likes/$postId'
+      fullPath: '/likes/$postId'
+      preLoaderRoute: typeof LikesPostIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/following/$uid': {
+      id: '/following/$uid'
+      path: '/following/$uid'
+      fullPath: '/following/$uid'
+      preLoaderRoute: typeof FollowingUidRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/followers/$uid': {
+      id: '/followers/$uid'
+      path: '/followers/$uid'
+      fullPath: '/followers/$uid'
+      preLoaderRoute: typeof FollowersUidRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_tabs/workout': {
       id: '/_tabs/workout'
       path: '/workout'
@@ -600,11 +700,16 @@ const rootRouteChildren: RootRouteChildren = {
   NutritionRoute: NutritionRoute,
   OnboardingRoute: OnboardingRoute,
   ProfileSetupRoute: ProfileSetupRoute,
+  SearchRoute: SearchRoute,
   SettingsRoute: SettingsRoute,
   SigninRoute: SigninRoute,
   SleepRoute: SleepRoute,
   StreakRoute: StreakRoute,
   SubscriptionRoute: SubscriptionRoute,
+  FollowersUidRoute: FollowersUidRoute,
+  FollowingUidRoute: FollowingUidRoute,
+  LikesPostIdRoute: LikesPostIdRoute,
+  PostIdRoute: PostIdRoute,
   UUidRoute: UUidRoute,
 }
 export const routeTree = rootRouteImport

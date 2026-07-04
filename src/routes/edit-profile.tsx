@@ -21,6 +21,7 @@ function EditProfile() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
+  const [bio, setBio] = useState("");
   const [age, setAge] = useState("");
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
@@ -36,6 +37,7 @@ function EditProfile() {
     if (profile) {
       setName(profile.name);
       setUsername(profile.username ?? "");
+      setBio(profile.bio ?? "");
       setAge(String(profile.age));
       setHeight(String(profile.height));
       setWeight(String(profile.weight));
@@ -54,6 +56,7 @@ function EditProfile() {
       }
       await saveUserProfile(user.uid, user.email ?? profile.email, {
         name: name.trim(),
+        bio: bio.trim(),
         age: Number(age),
         gender: profile.gender,
         height: Number(height),
@@ -88,6 +91,10 @@ function EditProfile() {
           <div>
             <label className="text-xs font-semibold text-foreground/50 uppercase tracking-wider">Username</label>
             <input value={username} onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))} minLength={3} className={inputCls} placeholder="username" />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-foreground/50 uppercase tracking-wider">Bio</label>
+            <textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={160} rows={3} className="mt-2 w-full rounded-2xl bg-secondary px-4 py-3 text-[15px] outline-none focus:ring-2 focus:ring-accent/40 resize-none" placeholder="Tell people about yourself" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
