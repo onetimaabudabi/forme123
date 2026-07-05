@@ -22,7 +22,7 @@ function TabsLayout() {
   if (loading || !user || !profile) {
     return (
       <PhoneFrame>
-        <div className="h-full flex items-center justify-center text-sm text-foreground/40">Loading…</div>
+        <SplashScreen loading={loading || !user || !profile} />
       </PhoneFrame>
     );
   }
