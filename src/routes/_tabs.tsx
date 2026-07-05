@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { PhoneFrame } from "@/components/PhoneFrame";
 import { TabBar } from "@/components/TabBar";
+import { SplashScreen } from "@/components/SplashScreen";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_tabs")({
