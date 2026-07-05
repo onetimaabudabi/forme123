@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SubscriptionRouteImport } from './routes/subscription'
-import { Route as StreakRouteImport } from './routes/streak'
 import { Route as SleepRouteImport } from './routes/sleep'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SettingsRouteImport } from './routes/settings'
@@ -45,11 +44,6 @@ import { Route as TabsCoachRouteImport } from './routes/_tabs.coach'
 const SubscriptionRoute = SubscriptionRouteImport.update({
   id: '/subscription',
   path: '/subscription',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StreakRoute = StreakRouteImport.update({
-  id: '/streak',
-  path: '/streak',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SleepRoute = SleepRouteImport.update({
@@ -222,7 +216,6 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/sleep': typeof SleepRoute
-  '/streak': typeof StreakRoute
   '/subscription': typeof SubscriptionRoute
   '/coach': typeof TabsCoachRoute
   '/feed': typeof TabsFeedRoute
@@ -254,7 +247,6 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/sleep': typeof SleepRoute
-  '/streak': typeof StreakRoute
   '/subscription': typeof SubscriptionRoute
   '/coach': typeof TabsCoachRoute
   '/feed': typeof TabsFeedRoute
@@ -289,7 +281,6 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/sleep': typeof SleepRoute
-  '/streak': typeof StreakRoute
   '/subscription': typeof SubscriptionRoute
   '/_tabs/coach': typeof TabsCoachRoute
   '/_tabs/feed': typeof TabsFeedRoute
@@ -325,7 +316,6 @@ export interface FileRouteTypes {
     | '/settings'
     | '/signin'
     | '/sleep'
-    | '/streak'
     | '/subscription'
     | '/coach'
     | '/feed'
@@ -357,7 +347,6 @@ export interface FileRouteTypes {
     | '/settings'
     | '/signin'
     | '/sleep'
-    | '/streak'
     | '/subscription'
     | '/coach'
     | '/feed'
@@ -391,7 +380,6 @@ export interface FileRouteTypes {
     | '/settings'
     | '/signin'
     | '/sleep'
-    | '/streak'
     | '/subscription'
     | '/_tabs/coach'
     | '/_tabs/feed'
@@ -426,7 +414,6 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   SigninRoute: typeof SigninRoute
   SleepRoute: typeof SleepRoute
-  StreakRoute: typeof StreakRoute
   SubscriptionRoute: typeof SubscriptionRoute
   FollowersUidRoute: typeof FollowersUidRoute
   FollowingUidRoute: typeof FollowingUidRoute
@@ -442,13 +429,6 @@ declare module '@tanstack/react-router' {
       path: '/subscription'
       fullPath: '/subscription'
       preLoaderRoute: typeof SubscriptionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/streak': {
-      id: '/streak'
-      path: '/streak'
-      fullPath: '/streak'
-      preLoaderRoute: typeof StreakRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sleep': {
@@ -704,7 +684,6 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   SigninRoute: SigninRoute,
   SleepRoute: SleepRoute,
-  StreakRoute: StreakRoute,
   SubscriptionRoute: SubscriptionRoute,
   FollowersUidRoute: FollowersUidRoute,
   FollowingUidRoute: FollowingUidRoute,
