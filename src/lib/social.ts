@@ -77,9 +77,11 @@ export function subscribeDiscoverFeed(onItems: (items: FeedItem[]) => void, max 
 
 /** Real-time subscription to a single user's posts (all activity_feed items). */
 export function subscribeUserPosts(uid: string, onItems: (items: FeedItem[]) => void, max = 200) {
-  const q = query(collection(getDb(), "activity_feed"), where("uid", "==", uid), orderBy("createdAt", "desc"), limit(max));
+  // Avoid requiring a composite (uid + createdAt) index by dropping orderBy and
+  // sorting client-side. Firestore's where-only query works without an index.
+  const q = query(collection(getDb(), "activity_feed"), where("uid", "==", uid), limit(max));
   return onSnapshot(q, (snap) => {
-    onItems(snap.docs.map((d) => {
+    const items = snap.docs.map((d) => {
       const data = d.data() as { uid: string; type: FeedItemType; payload: Record<string, unknown>; createdAt: Timestamp; likesCount?: number; commentsCount?: number };
       return {
         id: d.id, uid: data.uid, type: data.type,
@@ -88,8 +90,10 @@ export function subscribeUserPosts(uid: string, onItems: (items: FeedItem[]) => 
         likesCount: data.likesCount ?? 0,
         commentsCount: data.commentsCount ?? 0,
       };
-    }));
-  }, () => onItems([]));
+    });
+    items.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    onItems(items);
+  }, (err) => { console.error("subscribeUserPosts error", err); onItems([]); });
 }
 
 /** Real-time subscription to a single post document. */

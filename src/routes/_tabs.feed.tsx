@@ -285,15 +285,34 @@ function PostCard({ item, user, selfUid, onOpenComments }: {
         <video src={video} controls playsInline className="mt-3 w-full rounded-2xl bg-black aspect-video" />
       )}
 
-      <div className="mt-3 flex items-center gap-1 text-foreground/60">
-        <button onClick={like} disabled={busy} className={`h-9 px-3 rounded-full flex items-center gap-1.5 text-xs font-semibold transition ${liked ? "text-rose-500 bg-rose-500/10" : "hover:bg-secondary"}`}>
-          <Heart className={`size-4 ${liked ? "fill-current" : ""}`} />
-        </button>
-        <Link to="/likes/$postId" params={{ postId: item.id }} className="h-9 px-2 text-xs font-semibold hover:underline">{likes} likes</Link>
-        <button onClick={onOpenComments} className="h-9 px-3 rounded-full flex items-center gap-1.5 text-xs font-semibold hover:bg-secondary">
-          <MessageCircle className="size-4" />
-          <span>{item.commentsCount ?? 0}</span>
-        </button>
+      <div className="mt-3 flex items-center gap-4 text-foreground/70">
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={like}
+            disabled={busy}
+            aria-label={liked ? "Unlike" : "Like"}
+            className={`size-9 rounded-full flex items-center justify-center transition ${liked ? "text-rose-500 bg-rose-500/10" : "hover:bg-secondary"}`}
+          >
+            <Heart className={`size-[18px] ${liked ? "fill-current" : ""}`} />
+          </button>
+          <Link
+            to="/likes/$postId"
+            params={{ postId: item.id }}
+            className="text-xs font-semibold leading-none tabular-nums hover:underline"
+          >
+            {likes}
+          </Link>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={onOpenComments}
+            aria-label="Comments"
+            className="size-9 rounded-full flex items-center justify-center hover:bg-secondary"
+          >
+            <MessageCircle className="size-[18px]" />
+          </button>
+          <span className="text-xs font-semibold leading-none tabular-nums">{item.commentsCount ?? 0}</span>
+        </div>
       </div>
     </div>
   );
@@ -340,9 +359,12 @@ function Composer({ uid, onClose }: { uid: string; onClose: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center">
+    <div className="fixed inset-0 z-[100] flex items-end justify-center">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative w-full max-w-md mx-4 mb-6 rounded-3xl bg-background border shadow-2xl p-5 animate-in slide-in-from-bottom-8 duration-300">
+      <div
+        className="relative w-full max-w-md mx-4 mb-6 rounded-3xl bg-background border shadow-2xl p-5 animate-in slide-in-from-bottom-8 duration-300"
+        style={{ marginBottom: "calc(env(safe-area-inset-bottom, 0px) + 6rem)" }}
+      >
         <div className="flex items-center justify-between">
           <h3 className="text-base font-semibold">New post</h3>
           <button onClick={onClose} className="size-8 rounded-full bg-secondary flex items-center justify-center"><X className="size-4" /></button>
