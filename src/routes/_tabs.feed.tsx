@@ -359,9 +359,12 @@ function Composer({ uid, onClose }: { uid: string; onClose: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center">
+    <div className="fixed inset-0 z-[100] flex items-end justify-center">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative w-full max-w-md mx-4 mb-6 rounded-3xl bg-background border shadow-2xl p-5 animate-in slide-in-from-bottom-8 duration-300">
+      <div
+        className="relative w-full max-w-md mx-4 mb-6 rounded-3xl bg-background border shadow-2xl p-5 animate-in slide-in-from-bottom-8 duration-300"
+        style={{ marginBottom: "calc(env(safe-area-inset-bottom, 0px) + 6rem)" }}
+      >
         <div className="flex items-center justify-between">
           <h3 className="text-base font-semibold">New post</h3>
           <button onClick={onClose} className="size-8 rounded-full bg-secondary flex items-center justify-center"><X className="size-4" /></button>
