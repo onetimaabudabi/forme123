@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { PhoneFrame } from "@/components/PhoneFrame";
 import { TabBar } from "@/components/TabBar";
+import { SplashScreen } from "@/components/SplashScreen";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_tabs")({
@@ -21,7 +22,7 @@ function TabsLayout() {
   if (loading || !user || !profile) {
     return (
       <PhoneFrame>
-        <div className="h-full flex items-center justify-center text-sm text-foreground/40">Loading…</div>
+        <SplashScreen loading={loading || !user || !profile} />
       </PhoneFrame>
     );
   }
