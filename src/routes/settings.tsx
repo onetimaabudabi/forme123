@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PhoneFrame } from "@/components/PhoneFrame";
-import { ChevronLeft, ChevronRight, Bell, Moon, Sun, Smartphone, CreditCard, HelpCircle, FileText, LogOut, UserCog, Trash2, Calendar, Trophy, Flame, Crown, Users, History, Ruler, Sparkles, Apple, Rss, UserPlus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Bell, Moon, Sun, Smartphone, CreditCard, HelpCircle, FileText, LogOut, Trash2, Calendar, Trophy, Flame, History, Ruler, Sparkles, Apple } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTheme, type ThemeMode } from "@/lib/theme";
 import { useAuth } from "@/lib/auth";
@@ -114,25 +114,19 @@ function Settings() {
 
         <h2 className="mt-6 text-xs uppercase tracking-wider font-semibold text-foreground/40 px-1">Account</h2>
         <div className="mt-2 surface divide-y divide-black/5">
-          <LinkRow to="/edit-profile" icon={UserCog} label="Edit profile" />
           <LinkRow to="/activity" icon={Calendar} label="Activity calendar" />
           <LinkRow to="/subscription" icon={CreditCard} label="Subscription" />
         </div>
 
         <h2 className="mt-6 text-xs uppercase tracking-wider font-semibold text-foreground/40 px-1">Social</h2>
         <div className="mt-2 surface divide-y divide-black/5">
-          <LinkRow to="/feed" icon={Rss} label="Feed" />
           <LinkRow to="/notifications" icon={Bell} label="Notifications" />
-          <LinkRow to="/friends" icon={Users} label="Friends" />
-          <LinkRow to="/add-friend" icon={UserPlus} label="Add friend" />
-          <LinkRow to="/leaderboard" icon={Crown} label="Leaderboard" />
         </div>
 
         <h2 className="mt-6 text-xs uppercase tracking-wider font-semibold text-foreground/40 px-1">Progress</h2>
         <div className="mt-2 surface divide-y divide-black/5">
           <LinkRow to="/achievements" icon={Trophy} label="Achievements" />
           <LinkRow to="/challenges" icon={Flame} label="Daily challenges" />
-          <LinkRow to="/streak" icon={Calendar} label="Streak calendar" />
           <LinkRow to="/history" icon={History} label="Workout history" />
           <LinkRow to="/measurements" icon={Ruler} label="Body measurements" />
           <LinkRow to="/sleep" icon={Moon} label="Sleep tracking" />
