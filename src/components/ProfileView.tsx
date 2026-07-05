@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Settings, UserPlus, UserCheck, Film, Dumbbell, Target, Trophy, Flame, Scale, Ruler, MessageSquare } from "lucide-react";
+import { Settings, UserPlus, UserCheck, Film, Dumbbell, Target, Trophy, Flame, Scale, Ruler, MessageSquare, Crown } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { getPublicUser, type PublicUser } from "@/lib/usernames";
@@ -107,9 +107,18 @@ export function ProfileView({ uid }: Props) {
       {/* Actions */}
       <div className="mt-4 flex items-center gap-2">
         {isSelf ? (
-          <Link to="/edit-profile" className="flex-1 h-10 rounded-xl bg-secondary text-[13px] font-semibold flex items-center justify-center">
-            Edit profile
-          </Link>
+          <>
+            <Link to="/edit-profile" className="flex-1 h-10 rounded-xl bg-secondary text-[13px] font-semibold flex items-center justify-center">
+              Edit profile
+            </Link>
+            <Link
+              to="/leaderboard"
+              aria-label="Leaderboard"
+              className="h-10 px-3 rounded-xl bg-secondary text-[13px] font-semibold flex items-center justify-center gap-1.5"
+            >
+              <Crown className="size-4" /> Leaderboard
+            </Link>
+          </>
         ) : (
           <>
             <button onClick={toggleFollow} disabled={busy} className={`flex-1 h-10 rounded-xl text-[13px] font-semibold flex items-center justify-center gap-1.5 disabled:opacity-50 ${amFollowing ? "bg-secondary text-foreground" : "bg-black text-white"}`}>
