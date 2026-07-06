@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, limit, orderBy, query, Timestamp, updateDoc, where } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDocs, limit, onSnapshot, orderBy, query, Timestamp, updateDoc, where } from "firebase/firestore";
 import { getDb } from "./firebase";
 import { groqJSON, type GroqMessage } from "./groq";
 import type { UserProfile } from "./auth";
@@ -126,6 +126,26 @@ export async function listWorkoutHistory(uid: string, max = 50): Promise<Workout
       exercises: data.exercises ?? [],
       completedAt: data.completedAt.toDate(),
     };
+  });
+}
+
+export function subscribeWorkoutHistory(uid: string, cb: (items: WorkoutLog[]) => void): () => void {
+  const q = query(collection(getDb(), "workouts"), where("uid", "==", uid), limit(200));
+  return onSnapshot(q, (snap) => {
+    const items = snap.docs.map((d) => {
+      const data = d.data() as { uid: string; title: string; durationMin: number; kcal: number; exercises?: Exercise[]; completedAt: Timestamp };
+      return {
+        id: d.id,
+        uid: data.uid,
+        title: data.title,
+        durationMin: data.durationMin,
+        kcal: data.kcal,
+        exercises: data.exercises ?? [],
+        completedAt: data.completedAt.toDate(),
+      };
+    });
+    items.sort((a, b) => b.completedAt.getTime() - a.completedAt.getTime());
+    cb(items);
   });
 }
 
